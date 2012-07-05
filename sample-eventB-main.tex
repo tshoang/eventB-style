@@ -1,0 +1,704 @@
+\usepackage{bsymb}
+
+\title{A Sample Event-B Model}
+\author{Thai Son Hoang}
+
+
+
+
+
+
+
+\newBmch[datarefMch]{m2}
+\newBvrb[attendees]{atnds}
+\newBevt{OpenCourse}
+\newBevt{CloseCourse}
+
+
+\begin{document}
+
+\maketitle
+
+This document provide a sample Event-B model using typeset using the
+\textsf{eventB} package.
+
+\section{Contexts}
+\label{sec:contexts}
+
+\newBctx{coursesCtx}
+\newBset[COURSE]{CRS}
+\newBcst[maxC]{m}
+\newBaxm[axmFinCrs]{axm0\_1}
+\newBaxm[axmMaxNonNeg]{axm0\_2}
+\newBthm[thmMaxGrtZro]{thm0\_1}
+\newBaxm[axmMaxCrdCrs]{axm0\_3}
+
+Our initial context $\coursesCtx$ contains a carrier set $\COURSE$
+denoting the set of courses that can be offered by the club.
+Moreover, $\coursesCtx$ includes a constant $\maxC$ denoting the
+maximum number of courses that the club can have at the same time.
+The context \coursesCtx is as follows.
+\begin{Bcode}
+  $
+  \carriersets{\COURSE}
+  $
+  \Bhspace
+  $
+  \constants{\maxC}
+  $
+  \Bvspace
+  $
+  \axioms{
+    \axmFinCrs: & \finite(\COURSE) \\
+    \axmMaxNonNeg: & \maxC \in \nat1 \\
+    \thmMaxGrtZro: & 0 < \maxC \\
+    \axmMaxCrdCrs: & \maxC \leq \card(\COURSE)
+  }
+  $
+\end{Bcode}
+
+Note that we label the axioms and theorems with the prefixes denoting
+the role of the modelling elements, i.e., $\Baxm{axm}$ and $\Bthm{thm}$,
+with some numbers.  For example, $\axmFinCrs$ denotes the first
+(i.e., $1$) axiom for the initial model (i.e., $0$).  We apply this
+systematic labelling through out our development.
+
+
+The assumption on $\COURSE$ and $\maxC$ are captured by the axioms and
+theorems as follows.  Axiom $\axmFinCrs$ states that $\COURSE$ is
+finite.  Axiom $\axmMaxNonNeg$ states that $\maxC$ is a member of the
+set of natural numbers (i.e., $\maxC$ is a natural number). Finally,
+$\axmMaxNonNeg$ states that $\maxC$ cannot exceed the number of
+possible courses that can be offered by the club, represented as
+$\card(\COURSE)$, the cardinality of $\COURSE$.  A derived property of
+$\maxC$ is presented as theorem $\thmMaxGrtZro$.
+
+\paragraph{$\thmpo{\thmMaxGrtZro}$}
+A proof obligation is generated for $\thmMaxGrtZro$ as follows.
+Notice that $\axmMaxCrdCrs$ does not appear in the set of hypotheses
+for the obligation, since it is declared after $\thmMaxGrtZro$.  By
+convention, each proof obligation is labelled according to the
+element involved and the name of the proof obligation rule.  Here
+$\thmpo{\thmMaxGrtZro}$ indicates that it is a \Bpo{THM} proof obligation
+for $\thmMaxGrtZro$.
+\begin{Bcode}
+  $\ldots$
+\end{Bcode}
+The obligations can be trivially discharged since $\nat1$ is the set of
+all positive natural numbers, i.e., $\{1, 2, \ldots\}$.
+
+\paragraph{$\axmwdpo{axm0\_3}$}
+It is required to prove that $\axmMaxCrdCrs$ is well-defined.  The
+corresponding proof obligation is as follows.
+\begin{Bcode}
+  $\ldots$
+\end{Bcode}
+Since the goal appears amongst the hypotheses, the proof obligation
+can be discharged trivially.  Note that the order of appearance of the
+axioms is important. In particular, $\axmMaxNonNeg$ needs to be
+declared before $\axmMaxCrdCrs$.
+
+
+\section{Machines}
+\label{sec:machines}
+
+\newBmch[coursesMch]{m0}
+\newBvrb[courses]{crs}
+\newBinv[invCrsTyp]{inv0\_1}
+\newBthm[thmFinCrs]{thm0\_2}
+\newBinv[invCrsLim]{inv0\_2}
+\newBevt{OpenCourses}
+\newBpar[course]{c}
+\newBgrd[grdCrsLim]{grd0\_1}
+\newBthm[thmCrsBelowLim]{thm0\_3}
+\newBact[actOPCrsUpd]{act0\_1}
+\newBevt{CloseCourses}
+\newBpar{cs}
+\newBthm[thmDlf]{DLF}
+
+We develop machine $\coursesMch$ of the initial model, focusing on
+courses opening and closing.  This machine sees context $\coursesCtx$
+as developed in Section~\ref{sec:contexts}, hence as a result has
+access to the carrier set $\COURSE$ and constant $\maxC$.  We model
+the set of opened courses by a variable, namely $\courses$.  Invariant
+$\Binv{inv0\_1}$ states that it is a subset of available courses
+$\COURSE$.  A consequence of this invariant and of axiom
+$\Baxm{axm0\_1}$ is that $\courses$ is finite, and this is stated in
+$\coursesMch$ as theorem $\Bthm{thm0\_2}$.  invariant $\Binv{inv0\_2}$
+states that the number of opened courses, i.e., $\card(\courses)$ is
+bounded above by $\maxC$.  Initially, all courses are closed hence
+$\courses$ is set to the empty set ($\emptyset$).
+\begin{Bcode}
+  $
+  \variables{\courses}
+  $
+  \Bhspace
+  $
+  \invariants{
+    \invCrsTyp: & \courses \subseteq \COURSE \\
+    \thmFinCrs: & \finite(\courses) \\
+    \invCrsLim: & \card(\courses) \leq \maxC
+  }
+  $
+  \Bvspace
+  $
+  \initialisation{
+    \courses \bcmeq \emptyset
+  }
+  $
+\end{Bcode}
+
+We model the opening and closing of courses using two events
+$\OpenCourses$ and $\CloseCourses$ as follows.
+\begin{Bcode}
+  $
+  \event[ordinary]{\OpenCourses}{}{}{
+    \grdCrsLim: & \card(\courses) \neq \maxC \\
+    \thmCrsBelowLim: & \courses \neq \COURSE
+  }{}{
+    \actOPCrsUpd: & \courses \bcmsuch \courses \subset
+    \courses^\prime \land \card(\courses^\prime) \leq \maxC
+  }
+  $
+  \Bvspace
+  $
+  \event[anticipated]{\CloseCourses}{}{\cs}{
+    \Bgrd{grd0\_1}: & \cs \subseteq \courses \\
+    \Bgrd{grd0\_2}: & \cs \neq \emptyset
+  }{}
+  {
+    \Bact{act0\_1}: & \courses \bcmeq \courses \setminus \cs
+  }
+  $
+\end{Bcode}
+
+We choose purposely to model these events using different features of
+\eventB.  In $\OpenCourses$, we use a nondeterministic action to model
+the fact that some new courses are opened, i.e., $\courses \subset
+\courses^\prime$, as long as the number of opened courses will not
+exceed its limit, i.e., $\card(\courses^\prime) \leq \maxC$.  The guard
+of the event states that the current number of opened courses has not
+yet reached the limit.
+
+$\CloseCourses$ models the set of courses that are going to be closed
+using parameter $\cs$.  It is a non-empty set of currently opened
+courses which is captured by $\CloseCourses$' guard.  The action is
+modelled straightforwardly by removing $\cs$ out of the set
+$\courses$.
+
+We set the convergence status for $\OpenCourses$ and $\CloseCourses$
+to be \emph{ordinary} and \emph{anticipated}, respectively.  We delay
+the reasoning about the convergence of $\CloseCourses$ to later
+refinements.  Our intention is to prove that there can be only
+finitely many occurrences of $\CloseCourses$ between any two
+$\OpenCourses$ events.
+
+We present some of the obligations to illustrate what needs to be
+proved for the consistency of $\coursesMch$.  We applied the proof
+obligation rules as showed earlier in this Section.  Notice that we
+can take the axioms and theorems of the seen context $\coursesCtx$ as
+hypotheses in the proof obligations.  For clarity, we show only parts
+of the hypotheses that are relevant for discharging the proof
+obligations.  Moreover, we also show the proof obligations in their
+simplified form, e.g., when the events' assignments are deterministic.
+
+\paragraph{$\thmpo{\thmFinCrs}$} This obligation is in order to
+ensure that $\thmFinCrs$ is derivable from previously declared
+invariants.
+\begin{Bcode}
+  $\ldots$
+\end{Bcode}
+The proof obligation holds trivially since $\courses$ is a subset of a
+finite set, i.e., $\COURSE$.
+
+\paragraph{$\invpo{\init}{\invCrsLim}$} This obligation ensures that the
+initialisation $\init$ establishes invariant $\invCrsLim$.
+\begin{Bcode}
+  $\ldots$
+\end{Bcode}
+Since the cardinality of the empty set $\emptyset$ is $0$, the proof
+obligation holds trivially. 
+
+\paragraph{$\grdthmpo{\OpenCourses}{\thmCrsBelowLim}$}  This obligation
+ensures that $\thmCrsBelowLim$ is derivable from the invariants and the
+previously declared guards of $\OpenCourses$. 
+\begin{Bcode}
+  $
+  \ldots
+  $
+\end{Bcode}
+Informally, we can derive from the hypotheses that $\card(\courses) <
+\card(\COURSE)$, hence $\courses$ must be different from $\COURSE$.
+
+\paragraph{$\fispo{\OpenCourses}{\actOPCrsUpd}$} This obligation
+ensures that the nondeterministic assignment of $\OpenCourses$ is
+feasible when the event is enabled.
+\begin{Bcode}
+  $
+  \ldots
+  $
+\end{Bcode}
+The reasoning about the proof obligation is as follows.  Since
+$\courses$ is different from $\COURSE$, there exists an element
+$\course$ which is closed, i.e., not in $\courses$.  By adding $\course$
+to the set of opened courses, we strictly increase the number of
+opened courses by $1$.  Moreover, the number of opened courses after
+executing the event is still within the limit since originally it is
+strictly below the limit.
+
+\paragraph{$\invpo{\CloseCourses}{\invCrsLim}$}
+This obligation is simplified accordingly since the assignment is
+deterministic.  The purpose of the obligation is to prove that
+$\CloseCourses$ maintains invariant $\invCrsLim$.
+\begin{Bcode}
+  $
+  \ldots
+  $
+\end{Bcode}
+Since removing some courses $\cs$ from the set of opened courses
+$\courses$ can only reduce its number, the proof obligation can be
+trivially discharged.
+
+\paragraph{$\thmpo{\thmDlf}$}
+The deadlock-freeness condition is encoded as theorem $\thmDlf$ of 
+machine $\coursesMch$, which results in the following proof
+obligation.
+\begin{Bcode}
+  $
+  \ldots
+  $
+\end{Bcode}
+We reason as follows.  If $\card(\courses) \neq \maxC$, the goal
+trivially holds.  Otherwise, i.e., $\card(\courses) = \maxC$, since
+$\maxC \neq 0$, we have that $\courses \neq \emptyset$.  As a result,
+we can prove that $\exists \cs \qdot \cs \subseteq \courses \land \cs
+\neq \emptyset$ by instantiating $\cs$ with $\courses$ itself.
+
+\section{Context Extension}
+\label{sec:context-extension}
+
+\newBctx[membersCtx]{membersCtx}
+\newBset[MEMBER]{MEM}
+\newBaxm[axmFinMem]{axm1\_1}
+\subsection{Context $\membersCtx$}
+
+This is an initial context (i.e., does not extend any other context)
+containing a carrier sets $\MEMBER$.  $\MEMBER$ represents the set of
+club members, with an axiom stating that it is finite.
+\begin{Bcode}
+  $
+  \carriersets{\MEMBER}
+  $
+  \Bhspace
+  $
+  \axioms{
+    \axmFinMem: & \finite(\MEMBER)
+  }
+  $
+\end{Bcode}
+
+
+\newBctx[participantsCtx]{participantsCtx}
+\newBcst[PARTICIPANT]{PRTCPT}
+\newBaxm[axmPcpTyp]{axm1\_2}
+\newBthm[thmFinPcp]{thm1\_1}
+\subsection{Context $\participantsCtx$}
+This context extends the previously defined context $\membersCtx$ and
+is as follows.
+\begin{Bcode}
+  $
+  \constants{\PARTICIPANT}
+  $
+  \Bhspace
+  $
+  \axioms{
+    \axmPcpTyp: & \PARTICIPANT \subseteq \MEMBER \\
+    \thmFinPcp: & \finite(\PARTICIPANT)
+  }
+  $
+\end{Bcode}
+Constant $\PARTICIPANT$ denotes the set of participants which must be
+members of the club ($\axmPcpTyp$).  Theorem $\thmFinPcp$ states that
+there can be only a finite number of participants, which gives rise to
+the following trivial proof obligation.
+\begin{Bcode}
+  $
+  \ldots
+  $
+\end{Bcode}
+An important point is that axiom $\axmFinMem$ of the abstract context
+$\membersCtx$ appears as a hypothesis in the proof obligation.
+
+\newBctx[instructorsCtx]{instructorsCtx}
+\newBcst[INSTRUCTOR]{INSTR}
+\newBcst[instructors]{instrs}
+\newBaxm[axmITRTyp]{axm1\_3}
+\newBaxm[axmItrTyp]{axm1\_4}
+\subsection{Context $\instructorsCtx$}
+This context extends two contexts $\coursesCtx$ and $\membersCtx$, and
+introduces two constants, namely $\INSTRUCTOR$ and $\instructors$.
+$\INSTRUCTOR$ models the set of instructors which are members of the
+club ($\Baxm{axm1\_3}$).  Constant $\instructors$ models the
+relationship between courses and instructors and is constrained by
+$\Baxm{axm1\_4}$: it is a \emph{total function} from $\COURSE$ to
+$\INSTRUCTOR$.
+\begin{Bcode}
+  $
+  \constants{\INSTRUCTOR, \instructors}
+  $
+  \Bvspace
+  $
+  \axioms{
+    \axmITRTyp: & \INSTRUCTOR \subseteq \MEMBER \\
+    \axmItrTyp: & \instructors \in \COURSE \tfun \INSTRUCTOR
+  }
+  $
+\end{Bcode}
+
+\section{Machine Refinement}
+\label{sec:machine-refinement}
+
+
+\newBmch[participantsMch]{m1}
+\newBvrb[participants]{prtcpts}
+\newBinv[invPcpTyp]{inv1\_1}
+\newBinv[invIntPcp]{inv1\_2}
+\newBevt{Register}
+\newBpar[participant]{p}
+\subsubsection{Machine $\participantsMch$}
+Machine $\participantsMch$ sees contexts $\instructorsCtx$ and
+$\participantsCtx$.  As a result, it implicitly sees $\coursesCtx$ and
+$\membersCtx$.  Variable $\courses$ is retained in this refinement.
+An additional variable $\participants$ representing information about
+course participants is introduced.  Invariant $\Binv{inv1\_1}$ models
+$\participants$ as a relation between the set of opened courses
+$\courses$ and the set of participants $\PARTICIPANT$.  Invariant
+$\Binv{inv1\_2}$ states that for every opened course $\course$, the
+instructor of that course, i.e., $\instructors(\course)$, is not
+amongst its participants, represented by $\participants[\{\course\}]$.
+\begin{Bcode}
+  $
+  \variables{\courses, \participants}
+  $
+  \Bvspace
+  $
+  \invariants{
+    \invPcpTyp: & \participants \in \courses \rel \PARTICIPANT \\
+    \invIntPcp: & \forall \course ~\qdot~ \course \in \courses ~\limp~
+    \instructors(\course) \notin \participants[\{\course\}]
+  }
+  $
+  \Bvspace
+  $
+  \initialisation{
+    \ldots \\
+    \participants \bcmeq \emptyset
+  }
+  $
+\end{Bcode}
+Initially, there are no opened courses hence $\participants$ is
+assigned to be $\emptyset$.
+The original abstract event $\OpenCourses$ stays unchanged in this
+refinement, while an additional assignment is added to $\CloseCourses$
+to update $\participants$ by removing the information about
+the set of closing courses $\cs$ from it.
+\begin{Bcode}
+  $ \event[anticipated]{\CloseCourses}{}{\cs}{\ldots}{}{
+    \ldots \\
+    \Bact{act1\_2}: & \participants \bcmeq \cs \domsub \participants }
+  $
+\end{Bcode}
+
+A new event is added, namely $\Register$, to model the registration of
+a participant $\participant$ for an opened course $\course$.  The
+guard of the event ensures that $\participant$ is not the instructor
+of the course ($\Bgrd{grd1\_3}$) and is not yet registered for the
+course ($\Bgrd{grd1\_4}$).  The action of the event update
+$\participants$ accordingly by adding the mapping $\course
+\mapsto \participant$ to it.
+\begin{Bcode}
+  $
+  \event[convergent]{\Register}{}{\participant, \course}{
+    \Bgrd{grd1\_1}: & \participant \in \PARTICIPANT \\
+    \Bgrd{grd1\_2}: & \course \in \courses \\
+    \Bgrd{grd1\_3}: & \participant \neq \instructors(\course) \\
+    \Bgrd{grd1\_4}: & \course \mapsto \participant
+    \notin \participants
+  }{}
+  {
+    \Bact{act1\_1}: & \participants \bcmeq \participants \bunion \{\course \mapsto \participant\}
+  }
+  $
+\end{Bcode}
+
+We attempt to prove that $\Register$ is convergent and $\CloseCourses$
+is anticipated using the following variant.
+\begin{Bcode}
+  $
+  \variant{(\courses \cprod \PARTICIPANT) ~\setminus~ \participants}
+  $
+\end{Bcode}
+The variant is a set of mappings, each links an opened course to a
+participant who has \emph{not} registered for the respective course.
+
+We present some of the important proof obligations for
+$\participantsMch$.  For events $\OpenCourses$ and $\CloseCourses$,
+proof obligations are trivial.
+
+\paragraph{$\invpo{\CloseCourses}{\invIntPcp}$} This obligation is to
+ensure that $\invIntPcp$ is maintained by $\CloseCourses$.  The
+obligation is trivial, in particular, given that $\course \notin \cs$,
+we have $(\cs \domsub \participants)[\{\course\}]$ is the same as
+$\participants[\{\course\}]$.
+\begin{Bcode}
+  $
+  \ldots
+  $
+\end{Bcode}
+
+\paragraph{$\invpo{\Register}{\invPcpTyp}$} This obligation is to
+guarantee that $\invPcpTyp$ is maintained by the new event
+$\Register$.
+\begin{Bcode}
+  $
+  \ldots
+  $
+\end{Bcode}
+
+\paragraph{$\finpo$} This obligation is to ensure that the declared
+variant used for proving convergence of events is finite.  This is
+trivial, since the set of opened course $\courses$ and the set of
+participants $\PARTICIPANT$ are both finite.
+\begin{Bcode}
+  $
+  \ldots
+  $
+\end{Bcode}
+
+\paragraph{$\varpo{\CloseCourses}$} This proof obligation ensures that
+anticipated event $\CloseCourses$ does not increase the variant.
+\begin{Bcode}
+  $
+  \ldots
+  $
+\end{Bcode}
+
+\paragraph{$\varpo{\Register}$} This proof obligation ensures that the
+convergent event $\Register$ decreases the variant.  This is trivial
+since a new mapping $\course \mapsto \participant$ is added to
+$\participants$, effectively increasing $\participants$, hence
+strictly decreasing the variant.
+\begin{Bcode}
+  $
+  \ldots
+  $
+\end{Bcode}
+
+\subsection{Machine $\datarefMch$}
+We perform a data refinement by replacing abstract variables
+$\courses$ and $\participants$ by a new concrete variable
+$\attendees$.  This machine does not explicitly model any
+requirements: it implicitly inherits requirements from previous
+abstract machines.  As stated in invariant $\Binv{inv2\_1}$,
+$\attendees$ is a \emph{partial function} from $\COURSE$ to some set
+of participants (i.e., member of $\pow(\PARTICIPANT)$).  Invariants
+$\Binv{inv2\_2}$ and $\Binv{inv2\_3}$ act as gluing invariants,
+linking abstract variables $\courses$ and $\participants$ with
+concrete variable $\attendees$.  Invariant $\Binv{inv2\_2}$ specifies
+that $\courses$ is the domain $\attendees$.  Invariant
+$\Binv{inv2\_3}$ states that for every opened courses $\course$, the
+set of participants attending that course represented abstractly as
+$\participants[\{\course\}]$ is the same as $\attendees(\course)$.
+\begin{Bcode}
+  $
+  \variables{\attendees}
+  $
+  \Bvspace
+  $
+  \invariants{
+    \Binv{inv2\_1}: & \attendees \in \COURSE \pfun \pow(\PARTICIPANT)
+    \\
+    \Binv{inv2\_2}: & \courses = \dom(\attendees) \\
+    \Binv{inv2\_3}: & \forall \course \qdot \course \in \courses
+    \limp \participants[\{\course\}] = \attendees(\course) \\
+    \Bthm{thm2\_1}: & \finite(\attendees) \\[2ex]
+  }
+  $
+  \Bvspace
+  $
+  \initialisation{
+    \attendees \bcmeq \emptyset
+  }
+  $
+\end{Bcode}
+We illustrate our data refinement by the following example.  Assume
+that the available courses $\COURSE$ are $\{\course_1, \course_2,
+\course_3\}$, with $\course_1$ and $\course_2$ being opened, i.e.,
+$\courses = \{\course_1, \course_2\}$.  Assume that $\course_1$ has no
+participants, and $\participant_1$ and $\participant_2$ are attending
+$\course_2$.  Abstract variable $\participants$ hence contains two
+mappings as follows $\{\course_2 \mapsto \participant_1, \course_2
+\mapsto \participant_2\}$.  The same information can be represented by
+the concrete variable $\attendees$ as follows $\{\course_1 \mapsto
+\emptyset, \course_2 \mapsto \{\participant_1, \participant_2\}\}$.
+
+We refine the events using data refinement as follows.  Event
+$\OpenCourses$ is refined by $\OpenCourse$ where one course (instead
+of possibly several courses) is opened at a time.  The course that is
+opening is represented by the concrete parameter $\course$.
+\begin{Bcode}[\footnotesize]
+  $
+  \event{\OpenCourses}{}{}{\Bgrd{grd0\_1}: & \card(\courses)
+    \neq \maxC \\
+    \Bthm{thm0\_1}: & \courses \neq \COURSE
+  }{}{
+    \Bact{act0\_1}: & \courses \bcmsuch
+    \courses \subset \courses^\prime \land 
+    \card(\courses^\prime) \leq \maxC
+  }
+  $
+  \Bhspace[2em]
+  $
+  \event{\OpenCourse}{\OpenCourses}{\course}{
+    \Bgrd{grd2\_1}: & \course \notin \dom(\attendees) \\
+    \Bgrd{grd2\_2}: & \card(\attendees) \neq \maxC
+  }{
+    \courses^\prime = \courses \bunion \{\course\}
+  }{
+    \Bact{act2\_1}: & \attendees(\course) \bcmeq \emptyset
+  }
+  $
+\end{Bcode}
+The concrete guards ensure that $\course$ is a closed course and the
+number of opened course ($\card(\attendees)$) has not reached the
+limit $\maxC$.  The action of $\OpenCourse$ sets the initial
+participants for the newly opened course $\course$ to be the empty
+set.  In order to prove the refinement relationship between
+$\OpenCourse$ and $\OpenCourses$, we need to give the witness for the
+after value of the disappearing variable $\courses^\prime$.  In this
+case, it is specified as $\courses^\prime = \courses \bunion
+\{\course\}$, i.e., adding the newly opened course $\course$ to the
+original set of opened courses $\courses$.
+
+Abstract event $\CloseCourses$ is refined by concrete event
+$\CloseCourse$, where one course $\course$ (instead of possibly
+several courses $\cs$) is closed at a time.  The guard and action of
+concrete event $\CloseCourse$ are as expected.
+\begin{Bcode}
+  $
+  \event[anticipated]{\CloseCourses}{}{\cs}{
+    \Bgrd{grd0\_1}: & \cs \subseteq \courses \\
+    \Bgrd{grd0\_2}: & \cs \neq \emptyset
+  }{}
+  {
+    \Bact{act0\_1}: & \courses \bcmeq \courses \setminus \cs \\
+    \Bact{act2}: & \participants \bcmeq \cs \domsub \participants
+  }
+  $
+  \Bhspace
+  $
+  \event[convergent]{\CloseCourse}{\CloseCourses}{\course}{
+    \Bgrd{grd2\_1}: & \course \in \dom(\attendees)
+  }{
+    \cs = \{\course\}
+  }
+  {
+    \Bact{act2\_1}: & \attendees \bcmeq \{\course\} \domsub \attendees
+  }
+  $
+\end{Bcode}
+We need to give the witness for the disappearing abstract parameter
+$\cs$. It is specified straightforwardly as $\cs = \{\course\}$.
+Notice also that we change the convergence status of $\CloseCourse$
+from \emph{anticipated} to \emph{convergent}.  We use the following
+variant to prove that $\CloseCourse$ is convergent.
+\begin{Bcode}
+  $
+  \variant{\card(\attendees)}
+  $
+\end{Bcode}
+The variant represents the number of mappings in $\attendees$, and
+since it is a partial function, it is also the same as the number of
+elements in its domain, i.e., $\card(\attendees) =
+\card(\dom(\attendees))$.  As a result, the variant represent the
+number of opened courses.
+
+Event $\Register$ is refined as follows%
+\footnote{%
+  We use prefixes $\Bevt{(abs\_)}$ and $\Bevt{(cnc\_)}$ to denote the
+  abstract and concrete version of the event, accordingly.%
+}, such that references to $\courses$ and $\participants$ in guard and
+action are replaced by references to $\attendees$.
+\begin{Bcode}[\scriptsize]
+  $
+  \event{(abs\_)\Register}{}{\participant, \course}{
+    \Bgrd{grd1\_1}: & \participant \in \PARTICIPANT \\
+    \Bgrd{grd1\_2}: & \course \in \courses \\
+    \Bgrd{grd1\_3}: & \participant \neq \instructors(\course) \\
+    \Bgrd{grd1\_4}: & \course \mapsto \participant
+    \notin \participants
+  }{}
+  {
+    \Bact{act1\_1}: & \participants \bcmeq \participants \bunion \{\course \mapsto \participant\}
+  }
+  $
+  \hspace{2em}
+  $
+  \event{(cnc\_)\Register}{\Register}{\participant, \course}{
+    \Bgrd{grd2\_1}: & \participant \in \PARTICIPANT \\
+    \Bgrd{grd2\_2}: & \course \in \dom(attendees) \\
+    \Bgrd{grd2\_3}: & \participant \neq \instructors(\course) \\
+    \Bgrd{grd2\_4}: & \participant \notin \attendees(\course)
+  }
+  {}
+  {
+    \Bact{act2\_1}: & \attendees(\course) \bcmeq \attendees(\course)
+    \bunion \{\participant\}
+  }
+  $
+\end{Bcode}
+
+We now show some proof obligations for proving the refinement of
+$\participantsMch$ by $\datarefMch$.
+
+\paragraph{$\simpo{\OpenCourse}{act0\_1}$} This proof obligation
+ensures that the action $\Bact{act0\_1}$ of abstract event
+$\OpenCourses$ can simulate the action of concrete event
+$\OpenCourse$.  Notice the use of the witness for $\courses^\prime$ as
+a hypothesis in the obligation.
+\begin{Bcode}
+  $
+  \ldots
+  $
+\end{Bcode}
+
+\paragraph{$\grdpo{CloseCourse}{grd0\_1}$} This proof obligation
+ensures that the guard of concrete event $\CloseCourse$ is stronger
+than the abstract guard $\Bgrd{grd0\_1}$ of abstract event
+$\CloseCourses$.  Note the use of the witness for $\cs$ as a
+hypothesis in the obligation.
+\begin{Bcode}
+  $
+  \ldots
+  $
+\end{Bcode}
+
+\paragraph{$\natpo{\CloseCourse}$} This proof obligation ensures that
+the variant is a natural number when $\CloseCourse$ is enabled.
+\begin{Bcode}
+  $
+  \ldots
+  $
+\end{Bcode}
+
+\paragraph{$\varpo{\CloseCourse}$} This proof obligation ensures that
+the variant is strictly decreased by $\CloseCourse$.  The obligation
+is trivial since the variant represents the number of opened courses
+and $\CloseCourse$ closes one of them.
+\begin{Bcode}
+  $
+  \ldots
+  $
+\end{Bcode}
+
+\end{document}
