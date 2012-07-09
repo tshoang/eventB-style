@@ -1,0 +1,34 @@
+;; RefTeX parse info file
+;; File: /Users/htson/Documents/topics/latex/eventB/sample-eventB-main.tex
+;; User: htson (Thai Son Hoang)
+
+(set reftex-docstruct-symbol '(
+
+
+(xr nil "\\\\\\\\\\\\")
+
+(index-tags)
+
+(is-multi nil)
+
+(bibview-cache)
+
+(master-dir . "/Users/htson/Documents/topics/latex/eventB/")
+
+(label-numbers)
+
+(bof "/Users/htson/Documents/topics/latex/eventB/sample-eventB-main.tex")
+
+(toc "toc" "    1 Context" "/Users/htson/Documents/topics/latex/eventB/sample-eventB-main.tex" nil 2 "1" "\\section{Context}" 305)
+
+("sec:context" "s" nil "/Users/htson/Documents/topics/latex/eventB/sample-eventB-main.tex" nil "")
+
+(toc "toc" "    2 Machines" "/Users/htson/Documents/topics/latex/eventB/sample-eventB-main.tex" nil 2 "2" "\\section{Machines}" 3022)
+
+("sec:machines" "s" nil "/Users/htson/Documents/topics/latex/eventB/sample-eventB-main.tex" nil "")
+
+(toc "toc" "    1 Context" "/Users/htson/Documents/topics/latex/eventB/sample-eventB-main.tex" nil 2 "1" "\\section{Context}" 305)
+
+(eof "/Users/htson/Documents/topics/latex/eventB/sample-eventB-main.tex")
+))
+
