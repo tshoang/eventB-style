@@ -27,7 +27,7 @@
 %<eventB>%%%%% BEGIN Identification part %%%%%
 %<eventB>\NeedsTeXFormat{LaTeX2e}\relax
 %<eventB>\ProvidesPackage{eventB}
-%<eventB>    [2012/07/03 v2.0 Package for typesetting Event-B models] 
+%<eventB>    [2012/02/19 v1.0.1 Package for typesetting Event-B models] 
 %<eventB>%%%%% END Identification part %%%%%
 % 
 %<*driver> 
@@ -62,7 +62,8 @@
 % Right brace   \}     Tilde         \~}
 % 
 % 
-% \changes{v1.0}{2012/04/27}{Initial version}
+% \changes{v1.0}{2012/07/03}{Initial version}
+% \changes{v1.0.1}{2013/02/19}{Ensure that the keywords, labels are in math-mode}
 % 
 % \GetFileInfo{eventB.sty}
 %
@@ -92,7 +93,7 @@
 % 
 % ^^A %%%%% Usage %%%%%%
 % \section{Usage}
-% 
+% See |sample-eventB.tex| for an example of how to use the package.
 % 
 % \StopEventually{
 % \PrintIndex
@@ -101,8 +102,6 @@
 %
 % ^^A %%%%% Implementation %%%%%
 % \section{Implementation}
-%
-% We load the standard |article| class and pass option |10pt| to it.
 %
 % \iffalse ^^A BEGIN Produce comments only in the resulting class file
 %<eventB>
@@ -115,10 +114,10 @@
 %%%%% END Package loading %%%%%
 
 %%%%% Keywords can be coloured by package option "color"
-\newcommand{\Bkeyword}[1]{\B@keyword{#1}}
-\newcommand{\Bidentifier}[1]{\B@identifier{#1}}
-\newcommand{\Blabel}[2][]{\B@label[#1]{#2}}
-\newcommand{\Bpo}[1]{\B@po{#1}}
+\newcommand{\Bkeyword}[1]{\ensuremath{\B@keyword{#1}}\xspace}
+\newcommand{\Bidentifier}[1]{\B@identifier{#1}\xspace}
+\newcommand{\Blabel}[2][]{\ensuremath{\B@label[#1]{#2}}\xspace}
+\newcommand{\Bpo}[1]{\ensuremath{\B@po{#1}}\xspace}
 \newcommand{\Bvspace}[1][2ex]{\\[#1]}
 \newcommand{\Bhspace}[1][2em]{\hspace{#1}}
 \newcommand{\Bsep}{\quad}
@@ -127,18 +126,18 @@
   \colorlet{Blabelcolor}{green!50!black}
   \colorlet{Bpocolor}{red}
   %%%%% Keywords are coloured.
-  \renewcommand{\Bkeyword}[1]{\textcolor{Bkeywordcolor}{\B@keyword{#1}}}
-  \renewcommand{\Blabel}[2][]{\textcolor{Blabelcolor}{\B@label[#1]{#2}}}
-  \renewcommand{\Bpo}[1]{\textcolor{Bpocolor}{\B@po{#1}}}
+  \renewcommand{\Bkeyword}[1]{\ensuremath{\textcolor{Bkeywordcolor}{\B@keyword{#1}}}\xspace}
+  \renewcommand{\Blabel}[2][]{\ensuremath{\textcolor{Blabelcolor}{\B@label[#1]{#2}}}\xspace}
+  \renewcommand{\Bpo}[1]{\ensuremath{\textcolor{Bpocolor}{\B@po{#1}}}\xspace}
 }
 \DeclareOption{colour}{
   \colorlet{Bkeywordcolor}{blue}
   \colorlet{Blabelcolor}{green!50!black}
   \colorlet{Bpocolor}{red}
   %%%%% Keywords are coloured.
-  \renewcommand{\Bkeyword}[1]{\textcolor{Bkeywordcolor}{\B@keyword{#1}}}
-  \renewcommand{\Blabel}[2][]{\textcolor{Blabelcolor}{\B@label[#1]{#2}}}
-  \renewcommand{\Bpo}[1]{\textcolor{Bpocolor}{\B@po{#1}}}
+  \renewcommand{\Bkeyword}[1]{\ensuremath{\textcolor{Bkeywordcolor}{\B@keyword{#1}}}\xspace}
+  \renewcommand{\Blabel}[2][]{\ensuremath{\textcolor{Blabelcolor}{\B@label[#1]{#2}}}\xspace}
+  \renewcommand{\Bpo}[1]{\ensuremath{\textcolor{Bpocolor}{\B@po{#1}}}\xspace}
 }
 
 \newcommand{\B@keyword}[1]{\ensuremath{\mathbf{#1}}\xspace}
