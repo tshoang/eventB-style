@@ -5,4 +5,5 @@
 *.ilg
 *.ind
 *.log
+*.rel
 *.toc
