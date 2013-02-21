@@ -27,14 +27,16 @@
 %<eventB>%%%%% BEGIN Identification part %%%%%
 %<eventB>\NeedsTeXFormat{LaTeX2e}\relax
 %<eventB>\ProvidesPackage{eventB}
-%<eventB>    [2012/02/19 v1.0.1 Package for typesetting Event-B models] 
+%<eventB>    [2012/02/21 v1.1 Package for typesetting Event-B models] 
 %<eventB>%%%%% END Identification part %%%%%
 % 
 %<*driver> 
 \documentclass[a4paper]{ltxdoc}
+\usepackage{eventB}
 \EnableCrossrefs
-% ^^A\CodelineIndex
-\PageIndex
+% ^^A Enable either \CodelineIndex or \PageIndex
+\CodelineIndex
+% ^^A\PageIndex
 \RecordChanges
 
 \begin{document}
@@ -64,14 +66,16 @@
 % 
 % \changes{v1.0}{2012/07/03}{Initial version}
 % \changes{v1.0.1}{2013/02/19}{Ensure that the keywords, labels are in math-mode}
-% 
+% \changes{v1.1}{2013/02/19}{Re-implement how options are defined,
+% added options 'box'}
+%
 % \GetFileInfo{eventB.sty}
 %
 % \title{The \textsf{eventB} package\thanks{This document
 % corresponds to \textsf{eventB}~\fileversion, dated~\filedate.}}
 % \author{Thai Son Hoang \\ ETH-Zurich \\ \texttt{<htson at inf dot
 % ethz dot ch>}}
-% \date{July 3, 2012}
+% \date{\today}
 % 
 % \maketitle
 % 
@@ -103,57 +107,52 @@
 % ^^A %%%%% Implementation %%%%%
 % \section{Implementation}
 %
+% \subsection{Package Loading}
+% \label{sec:package-loading}
+% We begin by loading the required package |xspace| and |xcolor|.
+
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>%%%%% BEGIN Package loading %%%%%
+% \fi^^A END Produce comments only in the resulting class file
+
+%    \begin{macrocode}
+\RequirePackage{xspace}
+\RequirePackage{xcolor}
+%    \end{macrocode}
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>%%%%% END Package loading %%%%%
+% \fi^^A END Produce comments only in the resulting class file
+
+% \subsection{Declaration of Options for the Package}
+% \label{sec:options}
+
 % \iffalse ^^A BEGIN Produce comments only in the resulting class file
 %<eventB>
 %<eventB>%%%%% BEGIN Declaration of options %%%%%
 % \fi^^A END Produce comments only in the resulting class file
+
+% In this part various options for the package are defined.
+
+% \section{Option for rounding boxes}
+% \label{sec:option-box}
+% By default, \eventB modelling elements, e.g., invariants, events,
+% etc., are displayed in a rounding box.  This option enables them to
+% be displayed without the rounding box.
+
 %    \begin{macrocode}
-%%%%% BEGIN Package loading %%%%%
-\RequirePackage{xspace}
-\RequirePackage{xcolor}
-%%%%% END Package loading %%%%%
-
-%%%%% Keywords can be coloured by package option "color"
-\newcommand{\Bkeyword}[1]{\ensuremath{\B@keyword{#1}}\xspace}
-\newcommand{\Bidentifier}[1]{\B@identifier{#1}\xspace}
-\newcommand{\Blabel}[2][]{\ensuremath{\B@label[#1]{#2}}\xspace}
-\newcommand{\Bpo}[1]{\ensuremath{\B@po{#1}}\xspace}
-\newcommand{\Bvspace}[1][2ex]{\\[#1]}
-\newcommand{\Bhspace}[1][2em]{\hspace{#1}}
-\newcommand{\Bsep}{\quad}
-\DeclareOption{color}{
-  \colorlet{Bkeywordcolor}{blue}
-  \colorlet{Blabelcolor}{green!50!black}
-  \colorlet{Bpocolor}{red}
-  %%%%% Keywords are coloured.
-  \renewcommand{\Bkeyword}[1]{\ensuremath{\textcolor{Bkeywordcolor}{\B@keyword{#1}}}\xspace}
-  \renewcommand{\Blabel}[2][]{\ensuremath{\textcolor{Blabelcolor}{\B@label[#1]{#2}}}\xspace}
-  \renewcommand{\Bpo}[1]{\ensuremath{\textcolor{Bpocolor}{\B@po{#1}}}\xspace}
-}
-\DeclareOption{colour}{
-  \colorlet{Bkeywordcolor}{blue}
-  \colorlet{Blabelcolor}{green!50!black}
-  \colorlet{Bpocolor}{red}
-  %%%%% Keywords are coloured.
-  \renewcommand{\Bkeyword}[1]{\ensuremath{\textcolor{Bkeywordcolor}{\B@keyword{#1}}}\xspace}
-  \renewcommand{\Blabel}[2][]{\ensuremath{\textcolor{Blabelcolor}{\B@label[#1]{#2}}}\xspace}
-  \renewcommand{\Bpo}[1]{\ensuremath{\textcolor{Bpocolor}{\B@po{#1}}}\xspace}
+\newlength{\B@oldfboxsep}
+\newcommand{\event}[7][]{
+  \setlength{\B@oldfboxsep}{\fboxsep}
+  \setlength{\fboxsep}{2ex}
+  \fbox{
+    \ensuremath{
+      \B@event[#1]{#2}{#3}{#4}{#5}{#6}{#7}
+    }
+  }
+  \setlength{\fboxsep}{\B@oldfboxsep}
 }
 
-\newcommand{\B@keyword}[1]{\ensuremath{\mathbf{#1}}\xspace}
-\newcommand{\B@identifier}[1]{\ensuremath{\mathit{#1}}\xspace}
-\newcommand{\B@label}[2][]{
-  \def\is@thm{#1}
-  \ifx\is@thm\@empty
-  \ensuremath{\mathsf{#2}}\xspace
-  \else
-  \ensuremath{\mathit{#2}}\xspace
-  \fi
-}
-
-%%%%% Bcode environment %%%%%
-%%%%% the same as ``center'' %%%%%
-\newenvironment{Bcode}[1][\normalsize]{\begin{center}#1}{\end{center}}
 \newcommand{\Bdeclaration}[2]{
   \fbox{
     \ensuremath{
@@ -173,16 +172,133 @@
   \setlength{\fboxsep}{\B@oldfboxsep}
 }
 
-\newcommand{\event}[7][]{
-  \setlength{\B@oldfboxsep}{\fboxsep}
-  \setlength{\fboxsep}{2ex}
-  \fbox{
-    \ensuremath{
-      \B@event[#1]{#2}{#3}{#4}{#5}{#6}{#7}
-    }
+\DeclareOption{nobox}{
+  \renewcommand{\event}[7][]{
+    \B@event[#1]{#2}{#3}{#4}{#5}{#6}{#7}
   }
-  \setlength{\fboxsep}{\B@oldfboxsep}
+  
+  \renewcommand{\Bdeclaration}[2]{
+    \B@declaration{#1}{#2}
+  }
+  
+  \renewcommand{\Bsection}[3][]{
+    \B@section[#1]{#2}{#3}
+  }
 }
+
+%    \end{macrocode}
+
+% \paragraph{Options for font size and spacing}
+% We define the default values for font size and some spacing
+% commands, and how the are redefined according to options |small|,
+% |compact|, and |tiny|. In particular, option |compact| and |tiny|
+% implies option |nobox|.
+
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>% Options for font size and spacing %%%%%
+% \fi^^A END Produce comments only in the resulting class file
+
+%    \begin{macrocode}
+\newcommand{\B@fontsize}{\normalsize} % The font size used in Bcode environment
+\newcommand{\Bvspace}[1][2ex]{\\[#1]} % Vertical space
+\newcommand{\Bhspace}[1][2em]{\hspace{#1}} % Horizontal space
+\newcommand{\Bsep}{\quad} % A small separation space
+
+\DeclareOption{small}{
+  \renewcommand{\B@fontsize}{\small}
+  \renewcommand{\Bvspace}[1][1ex]{\\[#1]}
+  \renewcommand{\Bhspace}[1][1em]{\hspace{#1}}
+  \renewcommand{\Bsep}{\ }
+% ^^A  \renewcommand{\eventinline}[7][]{
+% ^^A    \B@eventinline[#1]{#2}{#3}{#4}{#5}{#6}{#7}
+% ^^A  }
+}
+\DeclareOption{compact}{
+  \renewcommand{\B@fontsize}{\footnotesize}
+  \renewcommand{\Bvspace}[1][0ex]{\\[#1]}
+  \renewcommand{\Bhspace}[1][0.5em]{\hspace{#1}}
+  \renewcommand{\Bsep}{\ }
+  \ExecuteOptions{nobox}
+}
+\DeclareOption{tiny}{
+  \renewcommand{\B@fontsize}{\scriptsize}
+  \renewcommand{\Bvspace}[1][-0.5ex]{\\[#1]}
+  \renewcommand{\Bhspace}[1][0.5em]{\hspace{#1}}
+  \renewcommand{\Bsep}{\ }
+  \ExecuteOptions{nobox}
+}
+
+%    \end{macrocode}
+
+% \paragraph{Options for colouring}
+% Keywords, labels and identifiers in Event-B can be coloured. We
+% define several commands and redefine them accordingly for
+% colouring.  When |colour| (or |color|) option is enabled, one can
+% customise the colours for Event-B keywords, labels or identifier or
+% proof obligation labels.
+
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>% Options for colouring %%%%%
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\Bkeyword}[1]{\ensuremath{\B@keyword{#1}}\xspace}
+\newcommand{\Bidentifier}[1]{\ensuremath{\B@identifier{#1}}\xspace}
+\newcommand{\Blabel}[2][]{\ensuremath{\B@label[#1]{#2}}\xspace}
+\newcommand{\Bpo}[1]{\ensuremath{\B@po{#1}}\xspace}
+\DeclareOption{colour}{
+  \newcommand{\setBKeywordColour}[1]{\colorlet{B@keywordcolor}{#1}}
+  \setBKeywordColour{blue}
+  \newcommand{\setBIdentifierColour}[1]{\colorlet{B@identifiercolor}{#1}}
+  \setBIdentifierColour{blue!50!red}  
+  \newcommand{\setBLabelColour}[1]{\colorlet{B@labelcolor}{#1}}
+  \setBLabelColour{green!50!black}
+  \newcommand{\setBPOColour}[1]{\colorlet{B@pocolor}{#1}}
+  \setBPOColour{red}
+  \renewcommand{\Bkeyword}[1]{
+    \ensuremath{\textcolor{B@keywordcolor}{\B@keyword{#1}}}\xspace
+  }
+  \renewcommand{\Bidentifier}[1]{
+    \ensuremath{\textcolor{B@identifiercolor}{\B@identifier{#1}}}\xspace
+  }
+  \renewcommand{\Blabel}[2][]{
+    \ensuremath{\textcolor{B@labelcolor}{\B@label[#1]{#2}}}\xspace
+  }
+  \renewcommand{\Bpo}[1]{
+    \ensuremath{\textcolor{B@pocolor}{\B@po{#1}}}\xspace
+  }
+}
+\DeclareOption{color}{
+  \ExecuteOptions{colour}
+}
+
+%    \end{macrocode}
+
+%
+
+
+%    \begin{macrocode}
+%%%%% Bcode environment %%%%%
+\newenvironment{Bcode}[1][\B@fontsize]{\begin{center}#1}{\end{center}}
+
+%    \end{macrocode}
+
+%    \begin{macrocode}
+
+
+\newcommand{\B@keyword}[1]{\mathbf{#1}}
+\newcommand{\B@identifier}[1]{\mathit{#1}}
+\newcommand{\B@label}[2][]{
+  \def\is@thm{#1}
+  \ifx\is@thm\@empty
+  \mathsf{#2}
+  \else
+  \mathit{#2}
+  \fi
+}
+
+
 
 \newcommand{\eventinline}[7][]{
   \setlength{\B@oldfboxsep}{\fboxsep}
@@ -195,79 +311,13 @@
   \setlength{\fboxsep}{\B@oldfboxsep}
 }
 
-\DeclareOption{compact}{
-  \renewenvironment{Bcode}[1][\footnotesize]{\begin{center}#1}{\end{center}}
-  \renewcommand{\Bdeclaration}[2]{
-    \B@declaration{#1}{#2}
-  }
-
-  \renewcommand{\Bsection}[3][]{
-    \B@section[#1]{#2}{#3}
-  }
-
-  \renewcommand{\event}[7][]{
-    \B@event[#1]{#2}{#3}{#4}{#5}{#6}{#7}
-  }
-  
-  \renewcommand{\eventinline}[7][]{
-    \B@eventinline[#1]{#2}{#3}{#4}{#5}{#6}{#7}
-  }
-
-  \renewcommand{\Bvspace}[1][0ex]{\\[#1]}
-  \renewcommand{\Bhspace}[1][0.5em]{\hspace{#1}}
-  \renewcommand{\Bsep}{\ }
-}
-\DeclareOption{small}{
-  \renewenvironment{Bcode}[1][\footnotesize]{\begin{center}#1}{\end{center}}
-  \renewcommand{\Bvspace}[1][1ex]{\\[#1]}
-  \renewcommand{\Bhspace}[1][1em]{\hspace{#1}}
-  \renewcommand{\Bdeclaration}[2]{
-    \B@declaration{#1}{#2}
-  }
-
-  \renewcommand{\Bsection}[3][]{
-    \B@section[#1]{#2}{#3}
-  }
-
-  \renewcommand{\event}[7][]{
-    \B@event[#1]{#2}{#3}{#4}{#5}{#6}{#7}
-  }
-  \renewcommand{\eventinline}[7][]{
-    \B@eventinline[#1]{#2}{#3}{#4}{#5}{#6}{#7}
-  }
-
-  \renewcommand{\Bsep}{\ }
-
-}
-\DeclareOption{tiny}{
-  \renewenvironment{Bcode}[1][\scriptsize]{\begin{center}#1}{\end{center}}
-  \renewcommand{\Bvspace}[1][-0.5ex]{\\[#1]}
-  \renewcommand{\Bhspace}[1][0.5em]{\hspace{#1}}
-  \renewcommand{\Bdeclaration}[2]{
-    \B@declaration{#1}{#2}
-  }
-
-  \renewcommand{\Bsection}[3][]{
-    \B@section[#1]{#2}{#3}
-  }
-
-  \renewcommand{\event}[7][]{
-    \B@event[#1]{#2}{#3}{#4}{#5}{#6}{#7}
-  }
-  \renewcommand{\eventinline}[7][]{
-    \B@eventinline[#1]{#2}{#3}{#4}{#5}{#6}{#7}
-  }
-
-  \renewcommand{\Bsep}{\ }
-
-}
 
 \newcommand{\B@declaration}[2]{
   \begin{array}{l@{\Bsep}l}
     \Bkeyword{#1:} &  #2 
   \end{array}
 }
-\newlength{\B@oldfboxsep}
+
 \newcommand{\B@section}[3][]{
   \def\no@title{#1}
   \ifx\no@title\@empty
