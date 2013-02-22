@@ -99,6 +99,16 @@
 % \section{Usage}
 % See |sample-eventB.tex| for an example of how to use the package.
 % 
+% \subsection{Package Options}
+% \label{sec:package-options}
+% The package offers the following options:
+% \begin{itemize}
+% \item |nobox|: to disable to bounding boxes for the \eventB
+% modelling elements,
+% \item |small|, |compact|, |tiny|: options for font size,
+% \item |colour| (or |color|): to colour several modelling elements.
+% \end{itemize}
+
 % \StopEventually{
 % \PrintIndex
 % \PrintChanges
@@ -134,8 +144,7 @@
 
 % In this part various options for the package are defined.
 
-% \section{Option for rounding boxes}
-% \label{sec:option-box}
+% \paragraph{Option for rounding boxes}
 % By default, \eventB modelling elements, e.g., invariants, events,
 % etc., are displayed in a rounding box.  This option enables them to
 % be displayed without the rounding box.
@@ -210,9 +219,6 @@
   \renewcommand{\Bvspace}[1][1ex]{\\[#1]}
   \renewcommand{\Bhspace}[1][1em]{\hspace{#1}}
   \renewcommand{\Bsep}{\ }
-% ^^A  \renewcommand{\eventinline}[7][]{
-% ^^A    \B@eventinline[#1]{#2}{#3}{#4}{#5}{#6}{#7}
-% ^^A  }
 }
 \DeclareOption{compact}{
   \renewcommand{\B@fontsize}{\footnotesize}
@@ -274,19 +280,542 @@
 }
 
 %    \end{macrocode}
+%
+% After declaration of options, we execute them accordingly. 
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>%%%%% BEGIN Execution of options %%%%%
+%<eventB>
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\ProcessOptions
+%    \end{macrocode}
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>%%%%% END Execution of options %%%%%
+%<eventB>
+% \fi^^A END Produce comments only in the resulting class file
+
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>%%%%% END Declaration of options %%%%%
+%<eventB>
+% \fi^^A END Produce comments only in the resulting class file
 
 %
 
+% \subsection{Commands for Pretty-Print Event-B Models}
+% \label{sec:comm-pretty-print}
+
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>%%%%% BEGIN Commands for Pretty-Print Event-B Models %%%%%
+% \fi^^A END Produce comments only in the resulting class file
+
+% We start with the definition of the |\eventB| macro.
+%    \begin{macrocode}
+\newcommand{\eventB}{Event-B\xspace}
+%    \end{macrocode}
+
+% The |Bcode| environment for displaying \eventB models.  The
+% environment has an optional argument for specifying the font size.
+% By default, it is the same as the |\B@fontsize| controlled by the
+% package option.   
+% 
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>% Bcode environment %
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newenvironment{Bcode}[1][\B@fontsize]{\begin{center}#1}{\end{center}}
+%    \end{macrocode}
+
+% \paragraph{Declarations and Collections}
+% \eventB modelling elements are organised into declarations (e.g.,
+% variables, constants, etc.) or collections (e.g., invariants,
+% axioms).  For each declaration, the input is a comma-separated list
+% of elements.  For each collection, the input is a
+% newly(|\\|)-separated list of elements.
+%
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>% Pretty print carrier sets
+%<eventB>% Arguments:
+%<eventB>% 1. (Comma-separated) list of carrier sets.
+%<eventB>%
+%<eventB>% Usage: \carriersets{S, T}
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\carriersets}[1]{
+  \Bdeclaration{sets}{#1}
+}
+%    \end{macrocode}
+
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>% Pretty print constants
+%<eventB>% Arguments:
+%<eventB>% 1. (Comma-separated) list of constants.
+%<eventB>%
+%<eventB>% Usage: \constants{m, n}
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\constants}[1]{
+  \Bdeclaration{constants}{#1}
+}
+%    \end{macrocode}
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>% Pretty print axioms
+%<eventB>% Arguments:
+%<eventB>% 1. (Newline(\\)-separated) list of axioms.
+%<eventB>%
+%<eventB>% Usage: \axioms{\Baxm{axm0\_1}: & x \in \nat \\
+%<eventB>%                \Baxm{axm0\_2}: & y \in \nat \\[2ex]}
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\axioms}[2][]{
+  \Bsection[#1]{axioms}{#2}
+}
+%    \end{macrocode}
+%
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>% Pretty print variables
+%<eventB>% Arguments:
+%<eventB>% 1. (Comma-separated) list of variables.
+%<eventB>%
+%<eventB>% Usage: \variables{x, y}
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\variables}[1]{
+  \Bdeclaration{variables}{#1}
+}
+%    \end{macrocode}
+%
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>% Pretty print invariants
+%<eventB>% Arguments:
+%<eventB>% 1. (Newline(\\)-separated) list of invariants.
+%<eventB>%
+%<eventB>% Usage: \invariants{\Binv{inv0\_1:} & x \in \nat \\
+%<eventB>%                    \Binv{inv0\_2:} & y \in \nat \\[2ex]}
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\invariants}[2][]{
+  \Bsection[#1]{invariants}{#2}
+}
+%    \end{macrocode}
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>% Pretty print variant
+%<eventB>% Arguments:
+%<eventB>% 1. The variant
+%<eventB>%
+%<eventB>% Usage: \variant{V}
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\variant}[1]{
+  \Bdeclaration{variant}{#1}
+}
+%    \end{macrocode}
+%
+% \paragraph{Event-B keywords}
+% We define the keywords for pretty-print \eventB models.
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>% Event-B keywords for pretty-printing events %
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\Bany}{\Bkeyword{any}}
+\newcommand{\Bbegin}{\Bkeyword{begin}}
+\newcommand{\Bend}{\Bkeyword{end}}
+\newcommand{\Brefines}{\Bkeyword{refines}}
+\newcommand{\Bstatus}{\Bkeyword{status}}
+\newcommand{\Bthen}{\Bkeyword{then}}
+\newcommand{\Bwhen}{\Bkeyword{when}}
+\newcommand{\Bwhere}{\Bkeyword{where}}
+\newcommand{\Bwith}{\Bkeyword{with}}
+%    \end{macrocode}
+%
+% \paragraph{Event-B modelling elements}
+% We define several macros for pretty-print \eventB modelling elements.
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>% Pretty-print Event-B modelling elements %
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\Bctx}[1]{\ensuremath{\mathbf{#1}}\xspace}
+\newcommand{\Bset}[1]{\Bidentifier{#1}}
+\newcommand{\Bcst}[1]{\Bidentifier{#1}}
+\newcommand{\Baxm}[1]{\Blabel{#1}}
+\newcommand{\Bthm}[1]{\Blabel[thm]{#1}}
+
+\newcommand{\Bmch}[1]{\ensuremath{\mathbf{#1}}\xspace}
+\newcommand{\Bvrb}[1]{\Bidentifier{#1}}
+\newcommand{\Binv}[1]{\Blabel{#1}}
+\newcommand{\Bevt}[1]{\Blabel{#1}}
+\newcommand{\Bpar}[1]{\Bidentifier{#1}}
+\newcommand{\Bact}[1]{\Blabel{#1}}
+\newcommand{\Bgrd}[1]{\Blabel{#1}}
+\newcommand{\Bbap}[1]{\hbox{\sl\bfseries #1}}
+%    \end{macrocode}
+%
+%
+% \paragraph{Meta-macros for creating macros for modelling elements}
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>%%%%% BEGIN Creating Event-B modelling elements macros %%%%%
+% \fi^^A END Produce comments only in the resulting class file
+% We define meta-marcos to create macros for different modelling
+% elements.
+%
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>% Create a new B macro
+%<eventB>% Arguments:
+%<eventB>% 1. The macro string, (OPTIONAL) if empty then the expanded string will be used.
+%<eventB>% 2. The expanded string
+%<eventB>% 3. The mark-up macros, e.g. \Bvrb
+%<eventB>% Usage:
+%<eventB>% - \B@newmacro[aaa]{a\_a\_a}{\Bvrb} will create a new macro \aaa
+%<eventB>% which will be expanded to be \Bvrb{a\_a\_a}
+%<eventB>% - \B@newmacro{aaa}{\Bvrb} will create a new macro \aaa
+%<eventB>% which will be expanded to be \Bvrb{aaa}
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\B@newmacro}[3][]{
+  \def\input@macro{#1}
+  \ifx\input@macro\@empty
+  \expandafter\def\csname #2\endcsname{#3{#2}}
+  \else
+  \expandafter\def\csname #1\endcsname{#3{#2}}
+  \fi
+}
+%    \end{macrocode}
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>% Create a new context macro
+%<eventB>% Arguments:
+%<eventB>% 1. The macro string (OPTIONAL)
+%<eventB>% 2. The expanded string
+%<eventB>% Usage:
+%<eventB>% - \newBctx[aaa]{a\_a\_a} will create a new macro \aaa
+%<eventB>% which will be expanded to be \Bctx{a\_a\_a}.
+%<eventB>% - \newBctx{aaa} will create a new macro \aaa which will be
+%<eventB>% expanded to be \Bctx{aaa}.
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\newBctx}[2][]{\B@newmacro[#1]{#2}{\Bctx}}
+%    \end{macrocode}
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>% Create a new carrier set macro
+%<eventB>% Arguments:
+%<eventB>% 1. The macro string (OPTIONAL)
+%<eventB>% 2. The expanded string
+%<eventB>% Usage:
+%<eventB>% - \newBset[aaa]{a\_a\_a} will create a new macro \aaa
+%<eventB>% which will be expanded to be \Bset{a\_a\_a}.
+%<eventB>% - \newBset{aaa} will create a new macro \aaa which will be
+%<eventB>% expanded to be \Bset{aaa}.
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\newBset}[2][]{\B@newmacro[#1]{#2}{\Bset}}
+%    \end{macrocode}
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>% Create a new constant macro
+%<eventB>% Arguments:
+%<eventB>% 1. The macro string (OPTIONAL)
+%<eventB>% 2. The expanded string
+%<eventB>% Usage:
+%<eventB>% - \newBcst[aaa]{a\_a\_a} will create a new macro \aaa
+%<eventB>% which will be expanded to be \Bcst{a\_a\_a}.
+%<eventB>% - \newBcst{aaa} will create a new macro \aaa which will be
+%<eventB>% expanded to be \Bcst{aaa}.
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\newBcst}[2][]{\B@newmacro[#1]{#2}{\Bcst}}
+%    \end{macrocode}
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>% Create a new axiom macro
+%<eventB>% Arguments:
+%<eventB>% 1. The macro string (OPTIONAL)
+%<eventB>% 2. The expanded string
+%<eventB>% Usage:
+%<eventB>% - \newBaxm[aaa]{a\_a\_a} will create a new macro \aaa
+%<eventB>% which will be expanded to be \Baxm{a\_a\_a}.
+%<eventB>% - \newBaxm{aaa} will create a new macro \aaa which will be
+%<eventB>% expanded to be \Baxm{aaa}.
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\newBaxm}[2][]{\B@newmacro[#1]{#2}{\Baxm}}
+%    \end{macrocode}
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>% Create a new theorem macro
+%<eventB>% Arguments:
+%<eventB>% 1. The macro string (OPTIONAL)
+%<eventB>% 2. The expanded string
+%<eventB>% Usage:
+%<eventB>% - \newBthm[aaa]{a\_a\_a} will create a new macro \aaa
+%<eventB>% which will be expanded to be \Bthm{a\_a\_a}.
+%<eventB>% - \newBthm{aaa} will create a new macro \aaa which will be
+%<eventB>% expanded to be \Bthm{aaa}.
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\newBthm}[2][]{\B@newmacro[#1]{#2}{\Bthm}}
+%    \end{macrocode}
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>% Create a new machine macro
+%<eventB>% Arguments:
+%<eventB>% 1. The macro string (OPTIONAL)
+%<eventB>% 2. The expanded string
+%<eventB>% Usage:
+%<eventB>% - \newBmch[aaa]{a\_a\_a} will create a new macro \aaa
+%<eventB>% which will be expanded to be \Bmch{a\_a\_a}.
+%<eventB>% - \newBmch{aaa} will create a new macro \aaa which will be
+%<eventB>% expanded to be \Bmch{aaa}.
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\newBmch}[2][]{\B@newmacro[#1]{#2}{\Bmch}}
+%    \end{macrocode}
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>% Create a new variable macro
+%<eventB>% Arguments:
+%<eventB>% 1. The macro string (OPTIONAL)
+%<eventB>% 2. The expanded string
+%<eventB>% Usage:
+%<eventB>% - \newBvrb[aaa]{a\_a\_a} will create a new macro \aaa
+%<eventB>% which will be expanded to be \Bvrb{a\_a\_a}.
+%<eventB>% - \newBvrb{aaa} will create a new macro \aaa which will be
+%<eventB>% expanded to be \Bvrb{aaa}.
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\newBvrb}[2][]{\B@newmacro[#1]{#2}{\Bvrb}}
+%    \end{macrocode}
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>% Create a new invariant macro
+%<eventB>% Arguments:
+%<eventB>% 1. The macro string (OPTIONAL)
+%<eventB>% 2. The expanded string
+%<eventB>% Usage:
+%<eventB>% - \newBinv[aaa]{a\_a\_a} will create a new macro \aaa
+%<eventB>% which will be expanded to be \Binv{a\_a\_a}.
+%<eventB>% - \newBinv{aaa} will create a new macro \aaa which will be
+%<eventB>% expanded to be \Binv{aaa}.
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\newBinv}[2][]{\B@newmacro[#1]{#2}{\Binv}}
+%    \end{macrocode}
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>% Create a new event macro
+%<eventB>% Arguments:
+%<eventB>% 1. The macro string (OPTIONAL)
+%<eventB>% 2. The expanded string
+%<eventB>% Usage:
+%<eventB>% - \newBevt[aaa]{a\_a\_a} will create a new macro \aaa
+%<eventB>% which will be expanded to be \Bevt{a\_a\_a}.
+%<eventB>% - \newBevt{aaa} will create a new macro \aaa which will be
+%<eventB>% expanded to be \Bevt{aaa}.
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\newBevt}[2][]{\B@newmacro[#1]{#2}{\Bevt}}
+%    \end{macrocode}
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>% Create a new parameter macro
+%<eventB>% Arguments:
+%<eventB>% 1. The macro string (OPTIONAL)
+%<eventB>% 2. The expanded string
+%<eventB>% Usage:
+%<eventB>% - \newBpar[aaa]{a\_a\_a} will create a new macro \aaa
+%<eventB>% which will be expanded to be \Bpar{a\_a\_a}.
+%<eventB>% - \newBpar{aaa} will create a new macro \aaa which will be
+%<eventB>% expanded to be \Bpar{aaa}.
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\newBpar}[2][]{\B@newmacro[#1]{#2}{\Bpar}}
+%    \end{macrocode}
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>% Create a new guard macro
+%<eventB>% Arguments:
+%<eventB>% 1. The macro string (OPTIONAL)
+%<eventB>% 2. The expanded string
+%<eventB>% Usage:
+%<eventB>% - \newBgrd[aaa]{a\_a\_a} will create a new macro \aaa
+%<eventB>% which will be expanded to be \Bgrd{a\_a\_a}.
+%<eventB>% - \newBgrd{aaa} will create a new macro \aaa which will be
+%<eventB>% expanded to be \Bgrd{aaa}.
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\newBgrd}[2][]{\B@newmacro[#1]{#2}{\Bgrd}}
+%    \end{macrocode}
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>% Create a new action macro
+%<eventB>% Arguments:
+%<eventB>% 1. The macro string (OPTIONAL)
+%<eventB>% 2. The expanded string
+%<eventB>% Usage:
+%<eventB>% - \newBact[aaa]{a\_a\_a} will create a new macro \aaa
+%<eventB>% which will be expanded to be \Bact{a\_a\_a}.
+%<eventB>% - \newBact{aaa} will create a new macro \aaa which will be
+%<eventB>% expanded to be \Bact{aaa}.
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\newBact}[2][]{\B@newmacro[#1]{#2}{\Bact}}
+%    \end{macrocode}
+%
+%
+%
+%    \begin{macrocode}
+
+%%%%% Theorem Proof Obligation
+%%%%% Print the theorem proof obligation, given the theorem label.
+%%%%% Arguments:
+%%%%% 1. Theorem label
+%%%%%
+%%%%% Usage:
+%%%%% - \thmpo{thm} will produce "thm/THM"
+\newcommand{\thmpo}[1]{\Bthm{#1}/\Bpo{THM}}
+
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+%%%%% Axiom Well-definedness Proof Obligation
+%%%%% Print the axiom well-definedness proof obligation, given the
+%%%%% axiom label.
+%%%%% Arguments:
+%%%%% 1. Axiom label
+%%%%%
+%%%%% Usage:
+%%%%% - \axmwdpo{axm} will produce "axm/WD"
+\newcommand{\axmwdpo}[1]{\Baxm{#1}/\Bpo{WD}}
+
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+%%%%% Invariant Proof Obligation
+%%%%% Print the invariant proof obligation, given the event name and
+%%%%% invariant label
+%%%%% Arguments:
+%%%%% 1. Event name
+%%%%% 2. Invariant label
+%%%%%
+%%%%% Usage:
+%%%%% - \invpo{evt}{inv} will produce "evt/inv/INV"
+\newcommand{\invpo}[2]{\Bevt{#1}/\Binv{#2}/\Bpo{INV}}
+
+%    \end{macrocode}
+%
+%
+%    \begin{macrocode}
+%%%%% Theorem (in guard) Proof Obligation
+%%%%% Print the simulation proof obligation, given the event name and
+%%%%% the theorem (in guard) label.
+%%%%% Arguments:
+%%%%% 1. Event name
+%%%%% 2. Theorem (in guard) label
+%%%%%
+%%%%% Usage:
+%%%%% - \grdthmpo{evt}{thm} will produce "evt/thm/THM"
+\newcommand{\grdthmpo}[2]{\Bevt{#1}/\Bthm{#2}/\Bpo{THM}}
+
+%    \end{macrocode}
+%
+%
+%    \begin{macrocode}
+%%%%% Feasibility Proof Obligation
+%%%%% Print the feasibility proof obligation, given the event name and
+%%%%% the action label
+%%%%% Arguments:
+%%%%% 1. Event name
+%%%%% 2. Action label
+%%%%%
+%%%%% Usage:
+%%%%% - \fispo{evt}{act} will produce "evt/act/FIS"
+\newcommand{\fispo}[2]{\Bevt{#1}/\Bact{#2}/\Bpo{FIS}}
+
+%    \end{macrocode}
+%
 
 %    \begin{macrocode}
-%%%%% Bcode environment %%%%%
-\newenvironment{Bcode}[1][\B@fontsize]{\begin{center}#1}{\end{center}}
+%%%%% Variant finiteness Proof Obligation
+%%%%% Print the Variant finiteness proof obligation
+%%%%% Arguments: No arguments
+%%%%%
+%%%%% Usage:
+%%%%% - \finpo will produce "FIN"
+\newcommand{\finpo}{\Bpo{FIN}}
+
+%    \end{macrocode}
+%
+%
+%
+%    \begin{macrocode}
+%%%%% Variant Proof Obligation
+%%%%% Print the guard strengthen proof obligation, given the event name
+%%%%% Arguments:
+%%%%% 1. Event name
+%%%%%
+%%%%% Usage:
+%%%%% - \grdpo{evt} will produce "evt/VAR"
+\newcommand{\varpo}[1]{\Bevt{#1}/\Bpo{VAR}}
+
+%    \end{macrocode}
+%
+%
+%
+%    \begin{macrocode}
+%%%%% Simulation Proof Obligation
+%%%%% Print the simulation proof obligation, given the event name and
+%%%%% the action label.
+%%%%% Arguments:
+%%%%% 1. Event name
+%%%%% 2. Action label
+%%%%%
+%%%%% Usage:
+%%%%% - \simpo{evt}{act} will produce "evt/act/SIM"
+\newcommand{\simpo}[2]{\Bevt{#1}/\Bact{#2}/\Bpo{SIM}}
+
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+%%%%% Guard Strengthen Proof Obligation
+%%%%% Print the guard strengthen proof obligation, given the event
+%%%%% name and the guard label
+%%%%% Arguments:
+%%%%% 1. (Abstract) Event name
+%%%%% 2. (Abstract) Guard label
+%%%%%
+%%%%% Usage:
+%%%%% - \grdpo{evt}{grd} will produce "evt/grd/GRD"
+\newcommand{\grdpo}[2]{\Bevt{#1}/\Bgrd{#2}/\Bpo{GRD}}
+
+%    \end{macrocode}
+%
+%
+%
+%    \begin{macrocode}
+%%%%% Variant Natural Number Proof Obligation
+%%%%% Print the Variant Natural Number proof obligation, given the event name
+%%%%% Arguments:
+%%%%% 1. Event name
+%%%%%
+%%%%% Usage:
+%%%%% - \natpo{evt} will produce "evt/NAT"
+\newcommand{\natpo}[1]{\Bevt{#1}/\Bpo{NAT}}
 
 %    \end{macrocode}
 
+
 %    \begin{macrocode}
-
-
 \newcommand{\B@keyword}[1]{\mathbf{#1}}
 \newcommand{\B@identifier}[1]{\mathit{#1}}
 \newcommand{\B@label}[2][]{
@@ -337,368 +866,24 @@
 \newcommand{\B@po}[1]{\ensuremath{\mathsf{#1}}\xspace}
 
 %    \end{macrocode}
-% \iffalse ^^A BEGIN Produce comments only in the resulting class file
-%<eventB>%%%%% END Declaration of options %%%%%
-%<eventB>
-% \fi^^A END Produce comments only in the resulting class file
 %
 %
-%    \begin{macrocode}
-%%%%% BEGIN Execution of options %%%%%
-\ProcessOptions
-%%%%% END Execution of options %%%%%
 
-%    \end{macrocode}
-%
+
+
 %
 %
 %    \begin{macrocode}
 %%%%% (BEGIN) Macros for Pretty-Print Event-B Components %%%
-\newcommand{\eventB}{Event-B\xspace}
 \newcommand{\SKIP}{\textsc{skip}}
 
-%%%%% Event-B Keywords %%%%%
-\newcommand{\Bany}{\Bkeyword{any}}
-\newcommand{\Bbegin}{\Bkeyword{begin}}
-\newcommand{\Bend}{\Bkeyword{end}}
-\newcommand{\Brefines}{\Bkeyword{refines}}
-\newcommand{\Bstatus}{\Bkeyword{status}}
-\newcommand{\Bthen}{\Bkeyword{then}}
-\newcommand{\Bwhen}{\Bkeyword{when}}
-\newcommand{\Bwhere}{\Bkeyword{where}}
-\newcommand{\Bwith}{\Bkeyword{with}}
 
 %    \end{macrocode}
 %
 %
 % 
-%%%%%    \begin{macrocode}
-%%%%% Event-B internal elements %%%%%
-\newcommand{\Bctx}[1]{\ensuremath{\mathbf{#1}}\xspace}
-\newcommand{\Bset}[1]{\Bidentifier{#1}}
-\newcommand{\Bcst}[1]{\Bidentifier{#1}}
-\newcommand{\Baxm}[1]{\Blabel{#1}}
-\newcommand{\Bthm}[1]{\Blabel[thm]{#1}}
 
-\newcommand{\Bmch}[1]{\ensuremath{\mathbf{#1}}\xspace}
-\newcommand{\Bvrb}[1]{\Bidentifier{#1}}
-\newcommand{\Binv}[1]{\Blabel{#1}}
-\newcommand{\Bevt}[1]{\Blabel{#1}}
-\newcommand{\Bpar}[1]{\Bidentifier{#1}}
-\newcommand{\Bact}[1]{\Blabel{#1}}
-\newcommand{\Bgrd}[1]{\Blabel{#1}}
-\newcommand{\Bbap}[1]{\hbox{\sl\bfseries #1}}
-%%%%%    \end{macrocode}
-%
-%
 
-%    \begin{macrocode}
-%%%%% Creating Event-B elements macros %%%%%
-
-%%%%% Create a new B macro
-%%%%% Arguments:
-%%%%% 1. The macro string, (OPTIONAL) if empty then the expanded string will be used.
-%%%%% 2. The expanded string
-%%%%% 3. The mark-up macros, e.g. \Bvrb
-%%%%% Usage:
-%%%%% - \B@newmacro[aaa]{a\_a\_a}{\Bvrb} will create a new macro \aaa
-%%%%% which will be expanded to be \Bvrb{a\_a\_a}
-%%%%% - \B@newmacro{aaa}{\Bvrb} will create a new macro \aaa
-%%%%% which will be expanded to be \Bvrb{aaa}
-%%%%%
-\newcommand{\B@newmacro}[3][]{
-  \def\input@macro{#1}
-  \ifx\input@macro\@empty
-  \expandafter\def\csname #2\endcsname{#3{#2}}
-  \else
-  \expandafter\def\csname #1\endcsname{#3{#2}}
-  \fi
-}
-
-%    \end{macrocode}
-%
-%
-%    \begin{macrocode}
-%%%%% Create a new context macro
-%%%%% Arguments:
-%%%%% 1. The macro string (OPTIONAL)
-%%%%% 2. The expanded string
-%%%%% Usage:
-%%%%% - \newBctx[aaa]{a\_a\_a} will create a new macro \aaa
-%%%%% which will be expanded to be \Bctx{a\_a\_a}.
-%%%%% - \newBctx{aaa} will create a new macro \aaa which will be
-%%%%% expanded to be \Bctx{aaa}.
-%%%%%
-\newcommand{\newBctx}[2][]{%
-  \B@newmacro[#1]{#2}{\Bctx}
-}
-
-%    \end{macrocode}
-
-%    \begin{macrocode}
-%%%%% Create a new carrier set macro
-%%%%% Arguments:
-%%%%% 1. The macro string (OPTIONAL)
-%%%%% 2. The expanded string
-%%%%% Usage:
-%%%%% - \newBset[aaa]{a\_a\_a} will create a new macro \aaa
-%%%%% which will be expanded to be \Bset{a\_a\_a}.
-%%%%% - \newBset{aaa} will create a new macro \aaa which will be
-%%%%% expanded to be \Bset{aaa}.
-%%%%%
-\newcommand{\newBset}[2][]{%
-  \B@newmacro[#1]{#2}{\Bset}
-}
-
-%    \end{macrocode}
-
-%    \begin{macrocode}
-%%%%% Create a new constant macro
-%%%%% Arguments:
-%%%%% 1. The macro string (OPTIONAL)
-%%%%% 2. The expanded string
-%%%%% Usage:
-%%%%% - \newBcst[aaa]{a\_a\_a} will create a new macro \aaa
-%%%%% which will be expanded to be \Bcst{a\_a\_a}.
-%%%%% - \newBcst{aaa} will create a new macro \aaa which will be
-%%%%% expanded to be \Bcst{aaa}.
-%%%%%
-\newcommand{\newBcst}[2][]{%
-  \B@newmacro[#1]{#2}{\Bcst}
-}
-
-%    \end{macrocode}
-
-%    \begin{macrocode}
-%%%%% Create a new axiom macro
-%%%%% Arguments:
-%%%%% 1. The macro string (OPTIONAL)
-%%%%% 2. The expanded string
-%%%%% Usage:
-%%%%% - \newBaxm[aaa]{a\_a\_a} will create a new macro \aaa
-%%%%% which will be expanded to be \Baxm{a\_a\_a}.
-%%%%% - \newBaxm{aaa} will create a new macro \aaa which will be
-%%%%% expanded to be \Baxm{aaa}.
-%%%%%
-\newcommand{\newBaxm}[2][]{%
-  \B@newmacro[#1]{#2}{\Baxm}
-}
-
-%    \end{macrocode}
-
-%    \begin{macrocode}
-%%%%% Create a new theorem macro
-%%%%% Arguments:
-%%%%% 1. The macro string (OPTIONAL)
-%%%%% 2. The expanded string
-%%%%% Usage:
-%%%%% - \newBthm[aaa]{a\_a\_a} will create a new macro \aaa
-%%%%% which will be expanded to be \Bthm{a\_a\_a}.
-%%%%% - \newBthm{aaa} will create a new macro \aaa which will be
-%%%%% expanded to be \Bthm{aaa}.
-%%%%%
-\newcommand{\newBthm}[2][]{%
-  \B@newmacro[#1]{#2}{\Bthm}
-}
-
-%    \end{macrocode}
-
-%    \begin{macrocode}
-%%%%% Create a new machine macro
-%%%%% Arguments:
-%%%%% 1. The macro string (OPTIONAL)
-%%%%% 2. The expanded string
-%%%%% Usage:
-%%%%% - \newBmch[aaa]{a\_a\_a} will create a new macro \aaa
-%%%%% which will be expanded to be \Bmch{a\_a\_a}.
-%%%%% - \newBmch{aaa} will create a new macro \aaa which will be
-%%%%% expanded to be \Bmch{aaa}.
-%%%%%
-\newcommand{\newBmch}[2][]{%
-  \B@newmacro[#1]{#2}{\Bmch}
-}
-
-%    \end{macrocode}
-%
-%    \begin{macrocode}
-%%%%% Create a new variable macro
-%%%%% Arguments:
-%%%%% 1. The macro string (OPTIONAL)
-%%%%% 2. The expanded string
-%%%%% Usage:
-%%%%% - \newBvrb[aaa]{a\_a\_a} will create a new macro \aaa
-%%%%% which will be expanded to be \Bvrb{a\_a\_a}.
-%%%%% - \newBvrb{aaa} will create a new macro \aaa which will be
-%%%%% expanded to be \Bvrb{aaa}.
-%%%%%
-\newcommand{\newBvrb}[2][]{%
-  \B@newmacro[#1]{#2}{\Bvrb}
-}
-
-%    \end{macrocode}
-
-%    \begin{macrocode}
-%%%%% Create a new invariant macro
-%%%%% Arguments:
-%%%%% 1. The macro string (OPTIONAL)
-%%%%% 2. The expanded string
-%%%%% Usage:
-%%%%% - \newBinv[aaa]{a\_a\_a} will create a new macro \aaa
-%%%%% which will be expanded to be \Binv{a\_a\_a}.
-%%%%% - \newBinv{aaa} will create a new macro \aaa which will be
-%%%%% expanded to be \Binv{aaa}.
-%%%%%
-\newcommand{\newBinv}[2][]{%
-  \B@newmacro[#1]{#2}{\Binv}
-}
-
-%    \end{macrocode}
-
-%    \begin{macrocode}
-%%%%% Create a new event macro
-%%%%% Arguments:
-%%%%% 1. The macro string (OPTIONAL)
-%%%%% 2. The expanded string
-%%%%% Usage:
-%%%%% - \newBevt[aaa]{a\_a\_a} will create a new macro \aaa
-%%%%% which will be expanded to be \Bevt{a\_a\_a}.
-%%%%% - \newBevt{aaa} will create a new macro \aaa which will be
-%%%%% expanded to be \Bevt{aaa}.
-%%%%%
-\newcommand{\newBevt}[2][]{%
-  \B@newmacro[#1]{#2}{\Bevt}
-}
-
-%    \end{macrocode}
-
-%    \begin{macrocode}
-%%%%% Create a new parameter macro
-%%%%% Arguments:
-%%%%% 1. The macro string (OPTIONAL)
-%%%%% 2. The expanded string
-%%%%% Usage:
-%%%%% - \newBpar[aaa]{a\_a\_a} will create a new macro \aaa
-%%%%% which will be expanded to be \Bpar{a\_a\_a}.
-%%%%% - \newBpar{aaa} will create a new macro \aaa which will be
-%%%%% expanded to be \Bpar{aaa}.
-%%%%%
-\newcommand{\newBpar}[2][]{%
-  \B@newmacro[#1]{#2}{\Bpar}
-}
-
-%    \end{macrocode}
-%
-
-%    \begin{macrocode}
-%%%%% Create a new guard macro
-%%%%% Arguments:
-%%%%% 1. The macro string (OPTIONAL)
-%%%%% 2. The expanded string
-%%%%% Usage:
-%%%%% - \newBgrd[aaa]{a\_a\_a} will create a new macro \aaa
-%%%%% which will be expanded to be \Bgrd{a\_a\_a}.
-%%%%% - \newBgrd{aaa} will create a new macro \aaa which will be
-%%%%% expanded to be \Bgrd{aaa}.
-%%%%%
-\newcommand{\newBgrd}[2][]{%
-  \B@newmacro[#1]{#2}{\Bgrd}
-}
-
-%    \end{macrocode}
-%
-%    \begin{macrocode}
-%%%%% Create a new action macro
-%%%%% Arguments:
-%%%%% 1. The macro string (OPTIONAL)
-%%%%% 2. The expanded string
-%%%%% Usage:
-%%%%% - \newBact[aaa]{a\_a\_a} will create a new macro \aaa
-%%%%% which will be expanded to be \Bact{a\_a\_a}.
-%%%%% - \newBact{aaa} will create a new macro \aaa which will be
-%%%%% expanded to be \Bact{aaa}.
-%%%%%
-\newcommand{\newBact}[2][]{%
-  \B@newmacro[#1]{#2}{\Bact}
-}
-
-%    \end{macrocode}
-%
-
-%
-%    \begin{macrocode}
-%%%%% Pretty print carrier sets
-%%%%% Arguments:
-%%%%% 1. (Comma-separated) list of carrier sets.
-%%%%%
-%%%%% Usage: \carriersets{S, T}
-\newcommand{\carriersets}[1]{
-  \Bdeclaration{sets}{#1}
-}
-
-%%%%% Pretty print constants
-%%%%% Arguments:
-%%%%% 1. (Comma-separated) list of constants.
-%%%%%
-%%%%% Usage: \constants{m, n}
-\newcommand{\constants}[1]{
-  \Bdeclaration{constants}{#1}
-}
-
-%    \end{macrocode}
-
-%    \begin{macrocode}
-%%%%% Pretty print axioms
-%%%%% Arguments:
-%%%%% 1. (Newline(\\)-separated) list of axioms.
-%%%%%
-%%%%% Usage: \axioms{\Baxm{axm0\_1}: & x \in \nat \\
-%%%%%                \Baxm{axm0\_2}: & y \in \nat \\[2ex]}
-\newcommand{\axioms}[2][]{
-  \Bsection[#1]{axioms}{#2}
-}
-
-%    \end{macrocode}
-%
-%
-%    \begin{macrocode}
-%%%%% Pretty print variables
-%%%%% Arguments:
-%%%%% 1. (Comma-separated) list of variables.
-%%%%%
-%%%%% Usage: \variables{x, y}
-\newcommand{\variables}[1]{
-  \Bdeclaration{variables}{#1}
-}
-
-%    \end{macrocode}
-%
-%
-%    \begin{macrocode}
-%%%%% Pretty print invariants
-%%%%% Arguments:
-%%%%% 1. (Newline(\\)-separated) list of invariants.
-%%%%%
-%%%%% Usage: \invariants{\Binv{inv0\_1:} & x \in \nat \\
-%%%%%                    \Binv{inv0\_2:} & y \in \nat \\[2ex]}
-\newcommand{\invariants}[2][]{
-  \Bsection[#1]{invariants}{#2}
-}
-
-%    \end{macrocode}
-
-%
-%
-%    \begin{macrocode}
-%%%%% Pretty print variant
-%%%%% Arguments:
-%%%%% 1. The variant
-%%%%%
-%%%%% Usage: \variant{V}
-\newcommand{\variant}[1]{
-  \Bdeclaration{variant}{#1}
-}
-
-%    \end{macrocode}
 %
 %
 %
@@ -971,147 +1156,6 @@
 }
 %    \end{macrocode}
 %
-%
-%
-%    \begin{macrocode}
-
-%%%%% Theorem Proof Obligation
-%%%%% Print the theorem proof obligation, given the theorem label.
-%%%%% Arguments:
-%%%%% 1. Theorem label
-%%%%%
-%%%%% Usage:
-%%%%% - \thmpo{thm} will produce "thm/THM"
-\newcommand{\thmpo}[1]{\Bthm{#1}/\Bpo{THM}}
-
-%    \end{macrocode}
-%
-%    \begin{macrocode}
-%%%%% Axiom Well-definedness Proof Obligation
-%%%%% Print the axiom well-definedness proof obligation, given the
-%%%%% axiom label.
-%%%%% Arguments:
-%%%%% 1. Axiom label
-%%%%%
-%%%%% Usage:
-%%%%% - \axmwdpo{axm} will produce "axm/WD"
-\newcommand{\axmwdpo}[1]{\Baxm{#1}/\Bpo{WD}}
-
-%    \end{macrocode}
-%
-%    \begin{macrocode}
-%%%%% Invariant Proof Obligation
-%%%%% Print the invariant proof obligation, given the event name and
-%%%%% invariant label
-%%%%% Arguments:
-%%%%% 1. Event name
-%%%%% 2. Invariant label
-%%%%%
-%%%%% Usage:
-%%%%% - \invpo{evt}{inv} will produce "evt/inv/INV"
-\newcommand{\invpo}[2]{\Bevt{#1}/\Binv{#2}/\Bpo{INV}}
-
-%    \end{macrocode}
-%
-%
-%    \begin{macrocode}
-%%%%% Theorem (in guard) Proof Obligation
-%%%%% Print the simulation proof obligation, given the event name and
-%%%%% the theorem (in guard) label.
-%%%%% Arguments:
-%%%%% 1. Event name
-%%%%% 2. Theorem (in guard) label
-%%%%%
-%%%%% Usage:
-%%%%% - \grdthmpo{evt}{thm} will produce "evt/thm/THM"
-\newcommand{\grdthmpo}[2]{\Bevt{#1}/\Bthm{#2}/\Bpo{THM}}
-
-%    \end{macrocode}
-%
-%
-%    \begin{macrocode}
-%%%%% Feasibility Proof Obligation
-%%%%% Print the feasibility proof obligation, given the event name and
-%%%%% the action label
-%%%%% Arguments:
-%%%%% 1. Event name
-%%%%% 2. Action label
-%%%%%
-%%%%% Usage:
-%%%%% - \fispo{evt}{act} will produce "evt/act/FIS"
-\newcommand{\fispo}[2]{\Bevt{#1}/\Bact{#2}/\Bpo{FIS}}
-
-%    \end{macrocode}
-%
-
-%    \begin{macrocode}
-%%%%% Variant finiteness Proof Obligation
-%%%%% Print the Variant finiteness proof obligation
-%%%%% Arguments: No arguments
-%%%%%
-%%%%% Usage:
-%%%%% - \finpo will produce "FIN"
-\newcommand{\finpo}{\Bpo{FIN}}
-
-%    \end{macrocode}
-%
-%
-%
-%    \begin{macrocode}
-%%%%% Variant Proof Obligation
-%%%%% Print the guard strengthen proof obligation, given the event name
-%%%%% Arguments:
-%%%%% 1. Event name
-%%%%%
-%%%%% Usage:
-%%%%% - \grdpo{evt} will produce "evt/VAR"
-\newcommand{\varpo}[1]{\Bevt{#1}/\Bpo{VAR}}
-
-%    \end{macrocode}
-%
-%
-%
-%    \begin{macrocode}
-%%%%% Simulation Proof Obligation
-%%%%% Print the simulation proof obligation, given the event name and
-%%%%% the action label.
-%%%%% Arguments:
-%%%%% 1. Event name
-%%%%% 2. Action label
-%%%%%
-%%%%% Usage:
-%%%%% - \simpo{evt}{act} will produce "evt/act/SIM"
-\newcommand{\simpo}[2]{\Bevt{#1}/\Bact{#2}/\Bpo{SIM}}
-
-%    \end{macrocode}
-%
-%    \begin{macrocode}
-%%%%% Guard Strengthen Proof Obligation
-%%%%% Print the guard strengthen proof obligation, given the event
-%%%%% name and the guard label
-%%%%% Arguments:
-%%%%% 1. (Abstract) Event name
-%%%%% 2. (Abstract) Guard label
-%%%%%
-%%%%% Usage:
-%%%%% - \grdpo{evt}{grd} will produce "evt/grd/GRD"
-\newcommand{\grdpo}[2]{\Bevt{#1}/\Bgrd{#2}/\Bpo{GRD}}
-
-%    \end{macrocode}
-%
-%
-%
-%    \begin{macrocode}
-%%%%% Variant Natural Number Proof Obligation
-%%%%% Print the Variant Natural Number proof obligation, given the event name
-%%%%% Arguments:
-%%%%% 1. Event name
-%%%%%
-%%%%% Usage:
-%%%%% - \natpo{evt} will produce "evt/NAT"
-\newcommand{\natpo}[1]{\Bevt{#1}/\Bpo{NAT}}
-
-%    \end{macrocode}
 % \Finale
 \endinput
 
