@@ -48,4 +48,4 @@ and version 1.3 or later is part of all distributions of LaTeX version
 
 
 --
-Copyright (C) 2012 by Thai Son Hoang <htson at inf.ethz.ch>
+Copyright (C) 2012-2013 by Thai Son Hoang <htson at inf.ethz.ch>
