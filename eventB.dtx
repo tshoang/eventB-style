@@ -851,19 +851,18 @@
 }
 
 \newcommand{\B@sectionbase}[3][]{
-  \def\no@title{#1}
-  \ifx\no@title\@empty
-  \begin{array}{l}
-    \B@keyword{#2:} \\
+  \ifthenelse{\equal{#1}{}}{
+    \begin{array}{l}
+      \B@keyword{#2:} \\
+      \begin{array}{l@{\B@tab}l}
+        #3
+      \end{array}
+    \end{array}
+  }{
     \begin{array}{l@{\B@tab}l}
       #3
     \end{array}
-  \end{array}
-  \else
-  \begin{array}{l@{\B@tab}l}
-    #3
-  \end{array}
-  \fi
+  }
 }
 
 \newcommand{\B@po}[1]{\ensuremath{\mathsf{#1}}\xspace}
