@@ -823,12 +823,11 @@
 \newcommand{\B@keywordbase}[1]{\mathbf{#1}}
 \newcommand{\B@identifier}[1]{\mathit{#1}}
 \newcommand{\B@label}[2][]{
-  \def\is@thm{#1}
-  \ifx\is@thm\@empty
-  \mathsf{#2}
-  \else
-  \mathit{#2}
-  \fi
+  \ifthenelse{\equal{#1}{}}{
+    \mathsf{#2}
+  }{
+    \mathit{#2}
+  }
 }
 
 
