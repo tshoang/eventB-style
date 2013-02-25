@@ -32,6 +32,7 @@
 
 \RequirePackage{xspace}
 \RequirePackage{xcolor}
+\RequirePackage{ifthen}
 %%%%% END Package loading %%%%%
 
 
@@ -123,7 +124,7 @@
 
 
 % Options for colouring %%%%%
-\newcommand{\Bkeyword}[1]{\ensuremath{\B@keywordbase{#1}}\xspace}
+\newcommand{\B@keyword}[1]{\ensuremath{\B@keywordbase{#1}}\xspace}
 \newcommand{\Bidentifier}[1]{\ensuremath{\B@identifier{#1}}\xspace}
 \newcommand{\Blabel}[2][]{\ensuremath{\B@label[#1]{#2}}\xspace}
 \newcommand{\Bpo}[1]{\ensuremath{\B@po{#1}}\xspace}
@@ -136,7 +137,7 @@
   \setBLabelColour{green!50!black}
   \newcommand{\setBPOColour}[1]{\colorlet{B@pocolor}{#1}}
   \setBPOColour{red}
-  \renewcommand{\Bkeyword}[1]{
+  \renewcommand{\B@keyword}[1]{
     \ensuremath{\textcolor{B@keywordcolor}{\B@keywordbase{#1}}}\xspace
   }
   \renewcommand{\Bidentifier}[1]{
@@ -232,15 +233,15 @@
 }
 
 % Event-B keywords for pretty-printing events %
-\newcommand{\Bany}{\Bkeyword{any}}
-\newcommand{\Bbegin}{\Bkeyword{begin}}
-\newcommand{\Bend}{\Bkeyword{end}}
-\newcommand{\Brefines}{\Bkeyword{refines}}
-\newcommand{\Bstatus}{\Bkeyword{status}}
-\newcommand{\Bthen}{\Bkeyword{then}}
-\newcommand{\Bwhen}{\Bkeyword{when}}
-\newcommand{\Bwhere}{\Bkeyword{where}}
-\newcommand{\Bwith}{\Bkeyword{with}}
+\newcommand{\Bany}{\B@keyword{any}}
+\newcommand{\Bbegin}{\B@keyword{begin}}
+\newcommand{\Bend}{\B@keyword{end}}
+\newcommand{\Brefines}{\B@keyword{refines}}
+\newcommand{\Bstatus}{\B@keyword{status}}
+\newcommand{\Bthen}{\B@keyword{then}}
+\newcommand{\Bwhen}{\B@keyword{when}}
+\newcommand{\Bwhere}{\B@keyword{where}}
+\newcommand{\Bwith}{\B@keyword{with}}
 
 % Pretty-print Event-B modelling elements %
 \newcommand{\Bctx}[1]{\ensuremath{\mathbf{#1}}\xspace}
@@ -271,12 +272,11 @@
 % - \B@newmacro{aaa}{\Bvrb} will create a new macro \aaa
 % which will be expanded to be \Bvrb{aaa}
 \newcommand{\B@newmacro}[3][]{
-  \def\input@macro{#1}
-  \ifx\input@macro\@empty
-  \expandafter\def\csname #2\endcsname{#3{#2}}
-  \else
-  \expandafter\def\csname #1\endcsname{#3{#2}}
-  \fi
+  \ifthenelse{\equal{#1}{}}{
+    \expandafter\def\csname #2\endcsname{#3{#2}}
+  }{
+    \expandafter\def\csname #1\endcsname{#3{#2}}
+  }
 }
 
 % Create a new context macro
@@ -537,7 +537,7 @@
 
 \newcommand{\B@declarationbase}[2]{
   \begin{array}{l@{\B@tab}l}
-    \Bkeyword{#1:} &  #2
+    \B@keyword{#1:} &  #2
   \end{array}
 }
 
@@ -545,7 +545,7 @@
   \def\no@title{#1}
   \ifx\no@title\@empty
   \begin{array}{l}
-    \Bkeyword{#2:} \\
+    \B@keyword{#2:} \\
     \begin{array}{l@{\B@tab}l}
       #3
     \end{array}

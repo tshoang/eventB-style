@@ -130,6 +130,7 @@
 %    \begin{macrocode}
 \RequirePackage{xspace}
 \RequirePackage{xcolor}
+\RequirePackage{ifthen}
 %    \end{macrocode}
 % \iffalse ^^A BEGIN Produce comments only in the resulting class file
 %<eventB>%%%%% END Package loading %%%%%
@@ -487,12 +488,11 @@
 % \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
 \newcommand{\B@newmacro}[3][]{
-  \def\input@macro{#1}
-  \ifx\input@macro\@empty
-  \expandafter\def\csname #2\endcsname{#3{#2}}
-  \else
-  \expandafter\def\csname #1\endcsname{#3{#2}}
-  \fi
+  \ifthenelse{\equal{#1}{}}{
+    \expandafter\def\csname #2\endcsname{#3{#2}}
+  }{
+    \expandafter\def\csname #1\endcsname{#3{#2}}
+  }
 }
 %    \end{macrocode}
 % \iffalse ^^A BEGIN Produce comments only in the resulting class file
