@@ -163,20 +163,23 @@
   \setlength{\fboxsep}{\B@oldfboxsep}
 }
 
-\newcommand{\Bdeclaration}[2]{
-  \fbox{
-    \ensuremath{
-      \B@declaration{#1}{#2}
-    }
-  }
-}
-
-\newcommand{\Bsection}[3][]{
+\newcommand{\B@declaration}[2]{
   \setlength{\B@oldfboxsep}{\fboxsep}
   \setlength{\fboxsep}{2ex}
   \fbox{
     \ensuremath{
-      \B@section[#1]{#2}{#3}
+      \B@declarationbase{#1}{#2}
+    }
+  }
+  \setlength{\fboxsep}{\B@oldfboxsep}
+}
+
+\newcommand{\B@section}[3][]{
+  \setlength{\B@oldfboxsep}{\fboxsep}
+  \setlength{\fboxsep}{2ex}
+  \fbox{
+    \ensuremath{
+      \B@sectionbase[#1]{#2}{#3}
     }
   }
   \setlength{\fboxsep}{\B@oldfboxsep}
@@ -187,12 +190,12 @@
     \B@event[#1]{#2}{#3}{#4}{#5}{#6}{#7}
   }
   
-  \renewcommand{\Bdeclaration}[2]{
-    \B@declaration{#1}{#2}
+  \renewcommand{\B@declaration}[2]{
+    \B@declarationbase{#1}{#2}
   }
   
-  \renewcommand{\Bsection}[3][]{
-    \B@section[#1]{#2}{#3}
+  \renewcommand{\B@section}[3][]{
+    \B@sectionbase[#1]{#2}{#3}
   }
 }
 
@@ -213,26 +216,26 @@
 \newcommand{\B@fontsize}{\normalsize} % The font size used in Bcode environment
 \newcommand{\Bvspace}[1][2ex]{\\[#1]} % Vertical space
 \newcommand{\Bhspace}[1][2em]{\hspace{#1}} % Horizontal space
-\newcommand{\Bsep}{\quad} % A small separation space
+\newcommand{\B@tab}{\quad} % A small separation space
 
 \DeclareOption{small}{
   \renewcommand{\B@fontsize}{\small}
   \renewcommand{\Bvspace}[1][1ex]{\\[#1]}
   \renewcommand{\Bhspace}[1][1em]{\hspace{#1}}
-  \renewcommand{\Bsep}{\ }
+  \renewcommand{\B@tab}{\ }
 }
 \DeclareOption{compact}{
   \renewcommand{\B@fontsize}{\footnotesize}
   \renewcommand{\Bvspace}[1][0ex]{\\[#1]}
   \renewcommand{\Bhspace}[1][0.5em]{\hspace{#1}}
-  \renewcommand{\Bsep}{\ }
+  \renewcommand{\B@tab}{\ }
   \ExecuteOptions{nobox}
 }
 \DeclareOption{tiny}{
   \renewcommand{\B@fontsize}{\scriptsize}
   \renewcommand{\Bvspace}[1][-0.5ex]{\\[#1]}
   \renewcommand{\Bhspace}[1][0.5em]{\hspace{#1}}
-  \renewcommand{\Bsep}{\ }
+  \renewcommand{\B@tab}{\ }
   \ExecuteOptions{nobox}
 }
 
@@ -250,7 +253,7 @@
 %<eventB>% Options for colouring %%%%%
 % \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
-\newcommand{\Bkeyword}[1]{\ensuremath{\B@keyword{#1}}\xspace}
+\newcommand{\B@keyword}[1]{\ensuremath{\B@keywordbase{#1}}\xspace}
 \newcommand{\Bidentifier}[1]{\ensuremath{\B@identifier{#1}}\xspace}
 \newcommand{\Blabel}[2][]{\ensuremath{\B@label[#1]{#2}}\xspace}
 \newcommand{\Bpo}[1]{\ensuremath{\B@po{#1}}\xspace}
@@ -263,8 +266,8 @@
   \setBLabelColour{green!50!black}
   \newcommand{\setBPOColour}[1]{\colorlet{B@pocolor}{#1}}
   \setBPOColour{red}
-  \renewcommand{\Bkeyword}[1]{
-    \ensuremath{\textcolor{B@keywordcolor}{\B@keyword{#1}}}\xspace
+  \renewcommand{\B@keyword}[1]{
+    \ensuremath{\textcolor{B@keywordcolor}{\B@keywordbase{#1}}}\xspace
   }
   \renewcommand{\Bidentifier}[1]{
     \ensuremath{\textcolor{B@identifiercolor}{\B@identifier{#1}}}\xspace
@@ -345,7 +348,7 @@
 % \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
 \newcommand{\carriersets}[1]{
-  \Bdeclaration{sets}{#1}
+  \B@declaration{sets}{#1}
 }
 %    \end{macrocode}
 
@@ -359,7 +362,7 @@
 % \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
 \newcommand{\constants}[1]{
-  \Bdeclaration{constants}{#1}
+  \B@declaration{constants}{#1}
 }
 %    \end{macrocode}
 % \iffalse ^^A BEGIN Produce comments only in the resulting class file
@@ -373,7 +376,7 @@
 % \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
 \newcommand{\axioms}[2][]{
-  \Bsection[#1]{axioms}{#2}
+  \B@section[#1]{axioms}{#2}
 }
 %    \end{macrocode}
 %
@@ -387,7 +390,7 @@
 % \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
 \newcommand{\variables}[1]{
-  \Bdeclaration{variables}{#1}
+  \B@declaration{variables}{#1}
 }
 %    \end{macrocode}
 %
@@ -402,7 +405,7 @@
 % \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
 \newcommand{\invariants}[2][]{
-  \Bsection[#1]{invariants}{#2}
+  \B@section[#1]{invariants}{#2}
 }
 %    \end{macrocode}
 % \iffalse ^^A BEGIN Produce comments only in the resulting class file
@@ -415,7 +418,7 @@
 % \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
 \newcommand{\variant}[1]{
-  \Bdeclaration{variant}{#1}
+  \B@declaration{variant}{#1}
 }
 %    \end{macrocode}
 %
@@ -426,15 +429,15 @@
 %<eventB>% Event-B keywords for pretty-printing events %
 % \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
-\newcommand{\Bany}{\Bkeyword{any}}
-\newcommand{\Bbegin}{\Bkeyword{begin}}
-\newcommand{\Bend}{\Bkeyword{end}}
-\newcommand{\Brefines}{\Bkeyword{refines}}
-\newcommand{\Bstatus}{\Bkeyword{status}}
-\newcommand{\Bthen}{\Bkeyword{then}}
-\newcommand{\Bwhen}{\Bkeyword{when}}
-\newcommand{\Bwhere}{\Bkeyword{where}}
-\newcommand{\Bwith}{\Bkeyword{with}}
+\newcommand{\Bany}{\B@keyword{any}}
+\newcommand{\Bbegin}{\B@keyword{begin}}
+\newcommand{\Bend}{\B@keyword{end}}
+\newcommand{\Brefines}{\B@keyword{refines}}
+\newcommand{\Bstatus}{\B@keyword{status}}
+\newcommand{\Bthen}{\B@keyword{then}}
+\newcommand{\Bwhen}{\B@keyword{when}}
+\newcommand{\Bwhere}{\B@keyword{where}}
+\newcommand{\Bwith}{\B@keyword{with}}
 %    \end{macrocode}
 %
 % \paragraph{Event-B modelling elements}
@@ -817,7 +820,7 @@
 
 
 %    \begin{macrocode}
-\newcommand{\B@keyword}[1]{\mathbf{#1}}
+\newcommand{\B@keywordbase}[1]{\mathbf{#1}}
 \newcommand{\B@identifier}[1]{\mathit{#1}}
 \newcommand{\B@label}[2][]{
   \def\is@thm{#1}
@@ -842,23 +845,23 @@
 }
 
 
-\newcommand{\B@declaration}[2]{
-  \begin{array}{l@{\Bsep}l}
-    \Bkeyword{#1:} &  #2 
+\newcommand{\B@declarationbase}[2]{
+  \begin{array}{l@{\B@tab}l}
+    \B@keyword{#1:} &  #2 
   \end{array}
 }
 
-\newcommand{\B@section}[3][]{
+\newcommand{\B@sectionbase}[3][]{
   \def\no@title{#1}
   \ifx\no@title\@empty
   \begin{array}{l}
-    \Bkeyword{#2:} \\
-    \begin{array}{l@{\Bsep}l}
+    \B@keyword{#2:} \\
+    \begin{array}{l@{\B@tab}l}
       #3
     \end{array}
   \end{array}
   \else
-  \begin{array}{l@{\Bsep}l}
+  \begin{array}{l@{\B@tab}l}
     #3
   \end{array}
   \fi
@@ -936,32 +939,32 @@
   \ifx\evt@sts\@empty
   \def\pretty@sts{}
   \else
-  \def\pretty@sts{\Bsep\Bstatus \Bsep \evt@sts \\}
+  \def\pretty@sts{\B@tab\Bstatus \B@tab \evt@sts \\}
   \fi
   % Pretty-print abstract events
   \ifx\evt@absevts\@empty
   \def\pretty@absevts{}
   \else
-  \def\pretty@absevts{\Bsep\Brefines \Bsep \evt@absevts \\}
+  \def\pretty@absevts{\B@tab\Brefines \B@tab \evt@absevts \\}
   \fi
   % Pretty-print parameters
   \ifx\evt@pars\@empty
   \def\pretty@pars{}
   \else
-  \def\pretty@pars{\Bsep\Bany \Bsep \evt@pars \Bsep \Bwhere \\}
+  \def\pretty@pars{\B@tab\Bany \B@tab \evt@pars \B@tab \Bwhere \\}
   \fi
   % Pretty-print guards
   \ifx\evt@grds\@empty
   \def\pretty@grds{}
   \else
   \def\evt@grds@tmp{
-    \begin{array}{@{\Bsep\Bsep}l@{\Bsep}l}
+    \begin{array}{@{\B@tab\B@tab}l@{\B@tab}l}
       \evt@grds
     \end{array}\\
   }
   \ifx\evt@pars\@empty
   \def\pretty@grds{
-    \Bsep \Bwhen \\
+    \B@tab \Bwhen \\
     \evt@grds@tmp
   }
   \else
@@ -973,8 +976,8 @@
   \def\pretty@wits{}
   \else
   \def\pretty@wits{
-    \Bsep\Bwith\\
-    \begin{array}{@{\Bsep\Bsep}ll}
+    \B@tab\Bwith\\
+    \begin{array}{@{\B@tab\B@tab}ll}
       \evt@wits
     \end{array}\\
   }
@@ -985,14 +988,14 @@
   \else
   \fi  
   \def\evt@acts@tmp{
-    \begin{array}{@{\Bsep\Bsep}l@{\Bsep}l}
+    \begin{array}{@{\B@tab\B@tab}l@{\B@tab}l}
       \evt@acts
     \end{array}\\
   }
-  \def\evt@acts@keyword{\Bsep\Bthen \\}
+  \def\evt@acts@keyword{\B@tab\Bthen \\}
   \ifx\evt@pars\@empty
   \ifx\evt@grds\@empty
-  \def\evt@acts@keyword{\Bsep\Bbegin \\}
+  \def\evt@acts@keyword{\B@tab\Bbegin \\}
   \else
   \fi
   \else
@@ -1010,7 +1013,7 @@
     \pretty@grds
     \pretty@wits
     \pretty@acts
-    \Bsep\Bend
+    \B@tab\Bend
   \end{array}
 }
 
