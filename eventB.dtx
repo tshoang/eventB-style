@@ -984,16 +984,15 @@
     }
   }
   % Pretty-print actions
-  % \ifx\evt@acts\@empty
-  % \def\evt@acts{\SKIP}
-  % \else
-  % \fi  
-  % \def\evt@acts@tmp{
-  %   \begin{array}{@{\B@tab\B@tab}l@{\B@tab}l}
-  %     \evt@acts
-  %   \end{array}\\
-  % }
-  % \def\evt@acts@keyword{\B@tab\Bthen \\}
+  \B@ifstrequal{\evt@acts}{}{
+    \def\evt@acts{\SKIP}
+  }{}
+  \newcommand\evt@acts@tmp{
+    \begin{array}{@{\B@tab\B@tab}l@{\B@tab}l}
+      \evt@acts
+    \end{array}\\
+  }
+  \newcommand\evt@acts@keyword{\B@tab\Bthen \\}
   % \ifx\evt@pars\@empty
   % \ifx\evt@grds\@empty
   % \def\evt@acts@keyword{\B@tab\Bbegin \\}
@@ -1013,7 +1012,7 @@
     \pretty@pars
     \pretty@grds
     \pretty@wits
-    % \pretty@acts
+    %\pretty@acts
     \B@tab\Bend
   \end{array}
 }
