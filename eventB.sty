@@ -274,7 +274,6 @@
 % which will be expanded to be \Bvrb{aaa}
 \newcommand{\B@newmacro}[3][]{
   \ifstrequal{#1}{}{
-  %\ifthenelse{\equal{#1}{}}{
     \expandafter\def\csname #2\endcsname{#3{#2}}
   }{
     \expandafter\def\csname #1\endcsname{#3{#2}}
@@ -518,7 +517,7 @@
 \newcommand{\B@keywordbase}[1]{\mathbf{#1}}
 \newcommand{\B@identifier}[1]{\mathit{#1}}
 \newcommand{\B@label}[2][]{
-  \ifthenelse{\equal{#1}{}}{
+  \ifstrequal{#1}{}{
     \mathsf{#2}
   }{
     \mathit{#2}
@@ -543,7 +542,7 @@
 }
 
 \newcommand{\B@sectionbase}[3][]{
-  \ifthenelse{\equal{#1}{}}{
+  \ifstrequal{#1}{}{
     \begin{array}{l}
       \B@keyword{#2:} \\
       \begin{array}{l@{\B@tab}l}
@@ -598,83 +597,85 @@
 %%%%% - Empty parameters, empty guards --> begin ... end
 %%%%% - Empty parameters --> when ... then ... end
 %%%%% - Empty actions --> \SKIP
-\newcommand{\B@event}[7][]{
-  \def\evt@sts{#1}
-  \def\evt@name{#2}
-  \def\evt@absevts{#3}
-  \def\evt@pars{#4}
-  \def\evt@grds{#5}
-  \def\evt@wits{#6}
-  \def\evt@acts{#7}
+\newcommand{\B@ifstrequal}{\expandafter\ifstrequal\expandafter}
+\newcommand{\B@event}[7][]{%
+  {
+  \newcommand\evt@sts{#1}%
+  \newcommand\evt@name{#2}%
+  \newcommand\evt@absevts{#3}%
+  \newcommand\evt@pars{#4}%
+  \newcommand\evt@grds{#5}%
+  \newcommand\evt@wits{#6}
+  \newcommand\evt@acts{#7}
   %% Pretty-print convergence status
-  \ifthenelse{\equal{\evt@sts}{}}{
-    \def\pretty@sts{}
+  \B@ifstrequal{\evt@sts}{}{
+    \newcommand\pretty@sts{}
   }{
-    \def\pretty@sts{\B@tab\Bstatus \B@tab \evt@sts \\}
+    \newcommand\pretty@sts{\B@tab\Bstatus \B@tab \evt@sts \\}
   }
   % Pretty-print abstract events
-  \ifthenelse{\equal{\evt@absevts}{}}{
-    \def\pretty@absevts{}
+  \B@ifstrequal{\evt@absevts}{}{
+    \newcommand\pretty@absevts{}
   }{
-    \def\pretty@absevts{\B@tab\Brefines \B@tab \evt@absevts \\}
+    \newcommand\pretty@absevts{\B@tab\Brefines \B@tab \evt@absevts{} \\}%
   }
   % Pretty-print parameters
-  \ifthenelse{\equal{\evt@pars}{}}{
-    \def\pretty@pars{}
+  \B@ifstrequal{\evt@pars}{}{
+    \newcommand\pretty@pars{}
   }{
-    \def\pretty@pars{\B@tab\Bany \B@tab \evt@pars \B@tab \Bwhere \\}
+    \newcommand\pretty@pars{\B@tab\Bany \B@tab \evt@pars \B@tab \Bwhere \\}
   }
   % Pretty-print guards
-  \ifx\evt@grds\@empty
-  \def\pretty@grds{}
-  \else
-  \def\evt@grds@tmp{
-    \begin{array}{@{\B@tab\B@tab}l@{\B@tab}l}
-      \evt@grds
-    \end{array}\\
-  }
-  \ifthenelse{\equal{\evt@pars}{}}{
-    \def\pretty@grds{
-      \B@tab \Bwhen \\
-      \evt@grds@tmp
-    }
+  \B@ifstrequal{\evt@grds}{}{
+    \newcommand\pretty@grds{}
   }{
-    \def\pretty@grds{\evt@grds@tmp}
+    \newcommand\pretty@grds@tmp{
+      \begin{array}{@{\B@tab\B@tab}l@{\B@tab}l}
+        \evt@grds
+      \end{array}\\
+    }
+    \B@ifstrequal{\evt@pars}{}{
+      \newcommand\pretty@grds{
+        \B@tab \Bwhen \\
+        \pretty@grds@tmp
+      }
+    }{
+      \newcommand\pretty@grds{\pretty@grds@tmp}
+    }
   }
-  \fi
   % Pretty-print witnesses
-  \ifx\evt@wits\@empty
-  \def\pretty@wits{}
-  \else
-  \def\pretty@wits{
-    \B@tab\Bwith\\
-    \begin{array}{@{\B@tab\B@tab}ll}
-      \evt@wits
-    \end{array}\\
+  \B@ifstrequal{\evt@wits}{}{
+    \newcommand\pretty@wits{}
+  }{
+    \newcommand\pretty@wits{
+      \B@tab\Bwith\\
+      \begin{array}{@{\B@tab\B@tab}ll}
+        \evt@wits
+      \end{array}\\
+    }
   }
-  \fi
   % Pretty-print actions
-  \ifx\evt@acts\@empty
-  \def\evt@acts{\SKIP}
-  \else
-  \fi
-  \def\evt@acts@tmp{
-    \begin{array}{@{\B@tab\B@tab}l@{\B@tab}l}
-      \evt@acts
-    \end{array}\\
-  }
-  \def\evt@acts@keyword{\B@tab\Bthen \\}
-  \ifx\evt@pars\@empty
-  \ifx\evt@grds\@empty
-  \def\evt@acts@keyword{\B@tab\Bbegin \\}
-  \else
-  \fi
-  \else
-  \fi
-  \def\pretty@acts{
-    \evt@acts@keyword
-    \evt@acts@tmp
-  }
+  % \ifx\evt@acts\@empty
+  % \def\evt@acts{\SKIP}
+  % \else
+  % \fi
+  % \def\evt@acts@tmp{
+  %   \begin{array}{@{\B@tab\B@tab}l@{\B@tab}l}
+  %     \evt@acts
+  %   \end{array}\\
+  % }
+  % \def\evt@acts@keyword{\B@tab\Bthen \\}
+  % \ifx\evt@pars\@empty
+  % \ifx\evt@grds\@empty
+  % \def\evt@acts@keyword{\B@tab\Bbegin \\}
+  % \else
+  % \fi
+  % \else
+  % \fi
+  % \def\pretty@acts{
+  %   \evt@acts@keyword
+  %   \evt@acts@tmp
+  % }
   % Really do it now
   \begin{array}{l}
     \Bevt{\evt@name} \\
@@ -683,9 +684,10 @@
     \pretty@pars
     \pretty@grds
     \pretty@wits
-    \pretty@acts
+    % \pretty@acts
     \B@tab\Bend
   \end{array}
+}
 }
 
 %%%%% Pretty print an general Event-B event
