@@ -787,14 +787,14 @@
   } % END group
 }
 %%%%% INITIALISATION label
-\newBevt{init}
+\newBevt{INITIALISATION}
 
 %%%%% Pretty print the initialisation: no ``refines'' clause. no parameters, no
 %%%%% guards
 %%%%% Arguments:
 %%%%% 1. (Newline(\\)-separated) list of assignments.
 %%%%%
-%%%%% Usage: \init{S1(v,x,y)\\S2(w,x,y)}
+%%%%% Usage: \initialisation{S1(v,x,y)\\S2(w,x,y)}
 %%%%%       will produce the following
 %%%%%
 %%%%%       init
@@ -804,7 +804,7 @@
 %%%%%       end
 %%%%%
 \newcommand{\initialisation}[1]{
-  \event{\init}{}{}{}{}{#1}
+  \event{\INITIALISATION}{}{}{}{}{#1}
 }
 \endinput
 %%
