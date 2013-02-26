@@ -655,27 +655,24 @@
     }
   }
   % Pretty-print actions
-  % \ifx\evt@acts\@empty
-  % \def\evt@acts{\SKIP}
-  % \else
-  % \fi
-  % \def\evt@acts@tmp{
-  %   \begin{array}{@{\B@tab\B@tab}l@{\B@tab}l}
-  %     \evt@acts
-  %   \end{array}\\
-  % }
-  % \def\evt@acts@keyword{\B@tab\Bthen \\}
-  % \ifx\evt@pars\@empty
-  % \ifx\evt@grds\@empty
-  % \def\evt@acts@keyword{\B@tab\Bbegin \\}
-  % \else
-  % \fi
-  % \else
-  % \fi
-  % \def\pretty@acts{
-  %   \evt@acts@keyword
-  %   \evt@acts@tmp
-  % }
+  \B@ifstrequal{\evt@acts}{}{
+    \renewcommand\evt@acts{\SKIP}
+  }{}
+  \newcommand\pretty@acts@tmp{
+    \begin{array}{@{\B@tab\B@tab}l@{\B@tab}l}
+      \evt@acts
+    \end{array}\\
+  }
+  \newcommand\pretty@acts@keyword{\B@tab\Bthen \\}
+  \B@ifstrequal{\evt@pars}{}{
+    \B@ifstrequal{\evt@grds}{}{
+      \renewcommand\pretty@acts@keyword{\B@tab\Bbegin \\}
+    }{}
+  }{}
+  \newcommand\pretty@acts{
+    \pretty@acts@keyword
+    \pretty@acts@tmp
+  }
   % Really do it now
   \begin{array}{l}
     \Bevt{\evt@name} \\
@@ -684,7 +681,7 @@
     \pretty@pars
     \pretty@grds
     \pretty@wits
-    % \pretty@acts
+    \pretty@acts
     \B@tab\Bend
   \end{array}
 }
