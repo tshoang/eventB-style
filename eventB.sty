@@ -33,6 +33,7 @@
 \RequirePackage{xspace}
 \RequirePackage{xcolor}
 \RequirePackage{ifthen}
+\RequirePackage{etoolbox}
 %%%%% END Package loading %%%%%
 
 
@@ -272,7 +273,8 @@
 % - \B@newmacro{aaa}{\Bvrb} will create a new macro \aaa
 % which will be expanded to be \Bvrb{aaa}
 \newcommand{\B@newmacro}[3][]{
-  \ifthenelse{\equal{#1}{}}{
+  \ifstrequal{#1}{}{
+  %\ifthenelse{\equal{#1}{}}{
     \expandafter\def\csname #2\endcsname{#3{#2}}
   }{
     \expandafter\def\csname #1\endcsname{#3{#2}}
@@ -605,23 +607,23 @@
   \def\evt@wits{#6}
   \def\evt@acts{#7}
   %% Pretty-print convergence status
-  \ifx\evt@sts\@empty
-  \def\pretty@sts{}
-  \else
-  \def\pretty@sts{\B@tab\Bstatus \B@tab \evt@sts \\}
-  \fi
+  \ifthenelse{\equal{\evt@sts}{}}{
+    \def\pretty@sts{}
+  }{
+    \def\pretty@sts{\B@tab\Bstatus \B@tab \evt@sts \\}
+  }
   % Pretty-print abstract events
-  \ifx\evt@absevts\@empty
-  \def\pretty@absevts{}
-  \else
-  \def\pretty@absevts{\B@tab\Brefines \B@tab \evt@absevts \\}
-  \fi
+  \ifthenelse{\equal{\evt@absevts}{}}{
+    \def\pretty@absevts{}
+  }{
+    \def\pretty@absevts{\B@tab\Brefines \B@tab \evt@absevts \\}
+  }
   % Pretty-print parameters
-  \ifx\evt@pars\@empty
-  \def\pretty@pars{}
-  \else
-  \def\pretty@pars{\B@tab\Bany \B@tab \evt@pars \B@tab \Bwhere \\}
-  \fi
+  \ifthenelse{\equal{\evt@pars}{}}{
+    \def\pretty@pars{}
+  }{
+    \def\pretty@pars{\B@tab\Bany \B@tab \evt@pars \B@tab \Bwhere \\}
+  }
   % Pretty-print guards
   \ifx\evt@grds\@empty
   \def\pretty@grds{}
@@ -631,14 +633,14 @@
       \evt@grds
     \end{array}\\
   }
-  \ifx\evt@pars\@empty
-  \def\pretty@grds{
-    \B@tab \Bwhen \\
-    \evt@grds@tmp
+  \ifthenelse{\equal{\evt@pars}{}}{
+    \def\pretty@grds{
+      \B@tab \Bwhen \\
+      \evt@grds@tmp
+    }
+  }{
+    \def\pretty@grds{\evt@grds@tmp}
   }
-  \else
-  \def\pretty@grds{\evt@grds@tmp}
-  \fi
   \fi
   % Pretty-print witnesses
   \ifx\evt@wits\@empty
