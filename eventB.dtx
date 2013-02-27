@@ -65,10 +65,24 @@
 % 
 % 
 % \changes{v1.0}{2012/07/03}{Initial version}
-% \changes{v1.0.1}{2013/02/19}{Ensure that the keywords, labels are in math-mode}
 % \changes{v1.1}{2013/02/19}{Re-implement how options are defined,
-% added options 'box'}
+% added options 'nobox'}
 % \changes{v1.1.1}{2013/02/23}{Updated documentation}
+% \changes{v2.0}{2013/02/26}{Major re-implementation, use
+% \textbf{etoolbox} instead of \textbf{ifthen}}
+% \changes{v2.0}{2013/02/26}{Updated documentation, added \textbf{DoNotIndex}}
+% 
+% \DoNotIndex{\DeclareOption, \ExecuteOptions, \ProcessOptions, \RequirePackage}
+% \DoNotIndex{\\, \ , \hspace, \quad, \setlength, \newlength}
+% \DoNotIndex{\newcommand, \renewcommand, \newenvironment}
+% \DoNotIndex{\normalsize, \small, \footnotesize, \scriptsize}
+% \DoNotIndex{\textsc}
+% \DoNotIndex{\ensuremath, \mathbf, \mathit, \mathsf}
+% \DoNotIndex{\begin, \end, \fbox, \fboxsep, \hbox}
+% \DoNotIndex{\textcolor, \colorlet}
+% \DoNotIndex{\xspace}
+% \DoNotIndex{\def, \csname, \endcsname, \expandafter, \ifstrequal}
+% \DoNotIndex{\land, \widehat}
 %
 % \GetFileInfo{eventB.sty}
 %
@@ -120,76 +134,344 @@
 %
 % \subsection{Package Loading}
 % \label{sec:package-loading}
-% We begin by loading the required package |xspace| and |xcolor|.
-
+% We begin by loading the required package |xspace|, |xcolor|, and |etoolbox|.
 % \iffalse ^^A BEGIN Produce comments only in the resulting class file
 %<eventB>
 %<eventB>%%%%% BEGIN Package loading %%%%%
 % \fi^^A END Produce comments only in the resulting class file
-
 %    \begin{macrocode}
 \RequirePackage{xspace}
 \RequirePackage{xcolor}
-\RequirePackage{ifthen}
 \RequirePackage{etoolbox}
 %    \end{macrocode}
 % \iffalse ^^A BEGIN Produce comments only in the resulting class file
 %<eventB>%%%%% END Package loading %%%%%
 % \fi^^A END Produce comments only in the resulting class file
+%
+% \subsection{Helper Macros}
+% \label{sec:helper-functions}
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>%%%%% BEGIN Helper Macros %%%%%
+% \fi^^A END Produce comments only in the resulting class file
+% We define same basic helper macros that will be used to defined
+% other macros.
+% \begin{macro}{\B@keywordbase}
+%   Basic macro for Event-B keywords.
+%   \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>%   Event-B keywords base
+%   \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\B@keywordbase}[1]{\mathbf{#1}}
+%    \end{macrocode}
+% \end{macro}
+% 
+% \begin{macro}{\B@identifierbase}
+%   Basic macro for Event-B identifiers.
+%   \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>%   Event-B identifiers base
+%   \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\B@identifierbase}[1]{\mathit{#1}}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\B@declarationbase}
+%   Basic macro for Event-B declarations (e.g., variables, constants, etc.).
+%   \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>%   Event-B declaration (e.g., variables, constants, etc.) base
+%   \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\B@declarationbase}[2]{
+  \begin{array}{l@{\B@tab}l}
+    \B@keyword{#1:} &  #2 
+  \end{array}
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\B@sectionbase}
+%   Basic macro for Event-B sections (e.g., invariants, axioms, etc.).
+%   \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>%   Event-B sections (e.g., variables, constants, etc.) base
+%   \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\B@sectionbase}[3][]{
+  \ifstrequal{#1}{}{
+    \begin{array}{l}
+      \B@keyword{#2:} \\
+      \begin{array}{l@{\B@tab}l}
+        #3
+      \end{array}
+    \end{array}
+  }{
+    \begin{array}{l@{\B@tab}l}
+      #3
+    \end{array}
+  }
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\B@ifstrequal}
+%   A wrapper for \ifstrequal to make sure that the first argument is properly expanded.
+%   \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>%   A wrapper for \ifstrequal to make sure that the first argument is properly expanded
+%   \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\B@ifstrequal}{\expandafter\ifstrequal\expandafter}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\B@eventbase}
+%   Basic macro for Event-B events.
+%   \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>%   Basic for pretty-print an Event-B event.
+%<eventB>%   Arguments:
+%<eventB>%   1. (Optional) convergence status.
+%<eventB>%   2. Name of the event.
+%<eventB>%   3. Name of the abstract event.
+%<eventB>%   4. (Comma-separated) list of parameters.
+%<eventB>%   5. (Newline(\\)-separated) list of guards.
+%<eventB>%   6. (Newline(\\)-separated) list of witness predicates.
+%<eventB>%   7. (Newline(\\)-separated) list of assignments.
+%<eventB>%   
+%<eventB>%   Usage: \B@eventbase[conv]{conc}{abs}{x,y}{G1\\G2}{W1\\W2}{S1\\S2}
+%<eventB>%   will produce the following
+%<eventB>%   
+%<eventB>%   conc
+%<eventB>%   refines abs
+%<eventB>%   status conv
+%<eventB>%   any x, y where
+%<eventB>%     G1
+%<eventB>%     G2
+%<eventB>%   with
+%<eventB>%     W1
+%<eventB>%     W2
+%<eventB>%   then
+%<eventB>%     S1
+%<eventB>%     S2
+%<eventB>%   end
+%<eventB>%   
+%<eventB>%   Special cases:
+%<eventB>%   - Empty abstract event --> refines clause is omitted.
+%<eventB>%   - Empty convergence status --> status clause is omitted.
+%<eventB>%   - Empty witness --> with clause is omitted.
+%<eventB>%   - Empty parameters, empty guards --> begin ... end
+%<eventB>%   - Empty parameters --> when ... then ... end
+%<eventB>%   - Empty actions --> \SKIP
+%   \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\B@eventbase}[7][]{%
+  { % BEGIN group
+%    \end{macrocode}
+% We first save the arguments to local variables.
+%    \begin{macrocode}
+    \newcommand\evt@sts{#1}% Event status
+    \newcommand\evt@label{#2}% Event label
+    \newcommand\evt@absevts{#3}% Abstract event
+    \newcommand\evt@pars{#4}% Event parameters
+    \newcommand\evt@grds{#5}% Event guards
+    \newcommand\evt@wits{#6}% Event witnesses
+    \newcommand\evt@acts{#7}% Event actions
+%    \end{macrocode}
+% The convergence status is skipped if empty.
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>    % Pretty-print convergence status
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+    \B@ifstrequal{\evt@sts}{}{
+      \newcommand\pretty@sts{}
+    }{
+      \newcommand\pretty@sts{\B@tab\Bstatus \B@tab \evt@sts \\}
+    }
+%    \end{macrocode}
+% The refines clause is skipped if there are no abstract events.
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>    % Pretty-print abstract events
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+    \B@ifstrequal{\evt@absevts}{}{
+      \newcommand\pretty@absevts{}
+    }{
+      \newcommand\pretty@absevts{\B@tab\Brefines \B@tab \evt@absevts{} \\}
+    }
+%    \end{macrocode}
+% The parameters is skipped if there are none.
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>    % Pretty-print parameters
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+    \B@ifstrequal{\evt@pars}{}{
+      \newcommand\pretty@pars{}
+    }{
+      \newcommand\pretty@pars{\B@tab\Bany \B@tab \evt@pars \B@tab \Bwhere \\}
+    }
+%    \end{macrocode}
+% The keywords for guards also depends on if there are parameters or not.
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>    % Pretty-print guards
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+    \B@ifstrequal{\evt@grds}{}{
+      \newcommand\pretty@grds{}
+    }{
+      \newcommand\pretty@grds@tmp{
+        \begin{array}{@{\B@tab\B@tab}l@{\B@tab}l}
+          \evt@grds
+        \end{array}\\
+      }
+      \B@ifstrequal{\evt@pars}{}{
+        \newcommand\pretty@grds{
+          \B@tab \Bwhen \\
+          \pretty@grds@tmp
+        }
+      }{
+        \newcommand\pretty@grds{\pretty@grds@tmp}
+      }
+    }
+%    \end{macrocode}
+% The witnesses are skipped if there are none.
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>    % Pretty-print witnesses
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+    \B@ifstrequal{\evt@wits}{}{
+      \newcommand\pretty@wits{}
+    }{
+      \newcommand\pretty@wits{
+        \B@tab\Bwith\\
+        \begin{array}{@{\B@tab\B@tab}ll}
+          \evt@wits
+        \end{array}\\
+      }
+    }
+%    \end{macrocode}
+% When there are no actions, \SKIP is used.  The keyword is changed
+% depending on whether the event has parameters or not.
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>    % Pretty-print actions
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+    \B@ifstrequal{\evt@acts}{}{
+      \renewcommand\evt@acts{\SKIP}
+    }{}
+    \newcommand\pretty@acts@tmp{
+      \begin{array}{@{\B@tab\B@tab}l@{\B@tab}l}
+        \evt@acts
+      \end{array}\\
+    }
+    \newcommand\pretty@acts@keyword{\B@tab\Bthen \\}
+    \B@ifstrequal{\evt@pars}{}{
+      \B@ifstrequal{\evt@grds}{}{
+        \renewcommand\pretty@acts@keyword{\B@tab\Bbegin \\}
+      }{}
+    }{}
+    \newcommand\pretty@acts{
+      \pretty@acts@keyword
+      \pretty@acts@tmp
+    }
+%    \end{macrocode}
+% Finally we put all the pretty-print pieces together.
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>    % Putting the pieces together
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+    \begin{array}{l}
+      \Bevt{\evt@label} \\
+      \pretty@sts
+      \pretty@absevts
+      \pretty@pars
+      \pretty@grds
+      \pretty@wits
+      \pretty@acts
+      \B@tab\Bend
+    \end{array}
+  } % END group
+}
+%    \end{macrocode}
+% \end{macro}
 
+
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>%%%%% END Helper Macros %%%%%
+% \fi^^A END Produce comments only in the resulting class file
+%
 % \subsection{Declaration of Options for the Package}
 % \label{sec:options}
-
 % \iffalse ^^A BEGIN Produce comments only in the resulting class file
 %<eventB>
 %<eventB>%%%%% BEGIN Declaration of options %%%%%
 % \fi^^A END Produce comments only in the resulting class file
-
 % In this part various options for the package are defined.
-
+%
 % \paragraph{Option for rounding boxes}
 % By default, \eventB modelling elements, e.g., invariants, events,
 % etc., are displayed in a rounding box.  This option enables them to
 % be displayed without the rounding box.
+%
+%
 
 %    \begin{macrocode}
-\newlength{\B@oldfboxsep}
-\newcommand{\event}[7][]{
-  \setlength{\B@oldfboxsep}{\fboxsep}
-  \setlength{\fboxsep}{2ex}
-  \fbox{
-    \ensuremath{
-      \B@event[#1]{#2}{#3}{#4}{#5}{#6}{#7}
-    }
+\newlength{\B@tmplength}
+\newcommand{\B@makebox}[1]{
+  {
+    \setlength{\B@tmplength}{\fboxsep}
+    \setlength{\fboxsep}{2ex}
+    \fbox{#1}
+    \setlength{\fboxsep}{\B@tmplength}
   }
-  \setlength{\fboxsep}{\B@oldfboxsep}
 }
+%    \end{macrocode}
 
+% \begin{macro}{\B@event}
+% \changes{v1.0.1}{2013/02/19}{Ensure math-mode}
+%    \begin{macrocode}
+\newcommand{\B@event}[7][]{
+  \B@makebox{
+    \ensuremath{
+      \B@eventbase[#1]{#2}{#3}{#4}{#5}{#6}{#7}
+    }  
+  }
+}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\B@declaration}
+% \changes{v1.0.1}{2013/02/19}{Ensure math-mode}
+%    \begin{macrocode}
 \newcommand{\B@declaration}[2]{
-  \setlength{\B@oldfboxsep}{\fboxsep}
-  \setlength{\fboxsep}{2ex}
-  \fbox{
+  \B@makebox{
     \ensuremath{
       \B@declarationbase{#1}{#2}
     }
   }
-  \setlength{\fboxsep}{\B@oldfboxsep}
 }
-
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\B@section}
+% \changes{v1.0.1}{2013/02/19}{Ensure math-mode}
+%    \begin{macrocode}
 \newcommand{\B@section}[3][]{
-  \setlength{\B@oldfboxsep}{\fboxsep}
-  \setlength{\fboxsep}{2ex}
-  \fbox{
+  \B@makebox{
     \ensuremath{
       \B@sectionbase[#1]{#2}{#3}
     }
   }
-  \setlength{\fboxsep}{\B@oldfboxsep}
 }
+%    \end{macrocode}
+% \end{macro}
 
+%    \begin{macrocode}
 \DeclareOption{nobox}{
-  \renewcommand{\event}[7][]{
-    \B@event[#1]{#2}{#3}{#4}{#5}{#6}{#7}
+  \renewcommand{\B@event}[7][]{
+    \B@eventbase[#1]{#2}{#3}{#4}{#5}{#6}{#7}
   }
   
   \renewcommand{\B@declaration}[2]{
@@ -252,11 +534,16 @@
 
 % \iffalse ^^A BEGIN Produce comments only in the resulting class file
 %<eventB>
-%<eventB>% Options for colouring %%%%%
+%<eventB>% Options for colouring %
 % \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
-\newcommand{\B@keyword}[1]{\ensuremath{\B@keywordbase{#1}}\xspace}
-\newcommand{\Bidentifier}[1]{\ensuremath{\B@identifier{#1}}\xspace}
+%<*eventB>
+% Default definition for Event-B keywords
+%</eventB>
+\newcommand{\B@keyword}[1]{\ensuremath{\B@keywordbase{#1}}\xspace} 
+\newcommand{\Bidentifier}[1]{\ensuremath{\B@identifierbase{#1}}\xspace}
+% Default definition for Event-B identifiers
+
 \newcommand{\Blabel}[2][]{\ensuremath{\B@label[#1]{#2}}\xspace}
 \newcommand{\Bpo}[1]{\ensuremath{\B@po{#1}}\xspace}
 \DeclareOption{colour}{
@@ -272,7 +559,7 @@
     \ensuremath{\textcolor{B@keywordcolor}{\B@keywordbase{#1}}}\xspace
   }
   \renewcommand{\Bidentifier}[1]{
-    \ensuremath{\textcolor{B@identifiercolor}{\B@identifier{#1}}}\xspace
+    \ensuremath{\textcolor{B@identifiercolor}{\B@identifierbase{#1}}}\xspace
   }
   \renewcommand{\Blabel}[2][]{
     \ensuremath{\textcolor{B@labelcolor}{\B@label[#1]{#2}}}\xspace
@@ -820,9 +1107,16 @@
 %    \end{macrocode}
 
 
+% \begin{macro}{\inlineevent}
+% \changes{v2.0}{2013/02/26}{Renamed from \textbf{eventinline}}
 %    \begin{macrocode}
-\newcommand{\B@keywordbase}[1]{\mathbf{#1}}
-\newcommand{\B@identifier}[1]{\mathit{#1}}
+\newcommand{\inlineevent}[7][]{
+  \B@inlineeventbase[#1]{#2}{#3}{#4}{#5}{#6}{#7}
+}
+%    \end{macrocode}
+% \end{macro}
+
+%    \begin{macrocode}
 \newcommand{\B@label}[2][]{
   \ifstrequal{#1}{}{
     \mathsf{#2}
@@ -833,38 +1127,8 @@
 
 
 
-\newcommand{\eventinline}[7][]{
-  \setlength{\B@oldfboxsep}{\fboxsep}
-  \setlength{\fboxsep}{2ex}
-  \fbox{
-    \ensuremath{
-      \B@eventinline[#1]{#2}{#3}{#4}{#5}{#6}{#7}
-    }
-  }
-  \setlength{\fboxsep}{\B@oldfboxsep}
-}
 
 
-\newcommand{\B@declarationbase}[2]{
-  \begin{array}{l@{\B@tab}l}
-    \B@keyword{#1:} &  #2 
-  \end{array}
-}
-
-\newcommand{\B@sectionbase}[3][]{
-  \ifstrequal{#1}{}{
-    \begin{array}{l}
-      \B@keyword{#2:} \\
-      \begin{array}{l@{\B@tab}l}
-        #3
-      \end{array}
-    \end{array}
-  }{
-    \begin{array}{l@{\B@tab}l}
-      #3
-    \end{array}
-  }
-}
 
 \newcommand{\B@po}[1]{\ensuremath{\mathsf{#1}}\xspace}
 
@@ -878,9 +1142,8 @@
 %
 %    \begin{macrocode}
 %%%%% (BEGIN) Macros for Pretty-Print Event-B Components %%%
-\newcommand{\SKIP}{\textsc{skip}}
-
-
+\newcommand{\SKIP}{\textsc{skip}\xspace}
+%
 %    \end{macrocode}
 %
 %
@@ -890,133 +1153,6 @@
 %
 %
 %
-%
-%    \begin{macrocode}
-%%%%% Pretty print an general Event-B event
-%%%%% Arguments:
-%%%%% 1. (Optional) convergence status.
-%%%%% 2. Name of the event.
-%%%%% 3. Name of the abstract event.
-%%%%% 4. (Comma-separated) list of parameters.
-%%%%% 5. (Newline(\\)-separated) list of guards.
-%%%%% 6. (Newline(\\)-separated) list of witness predicates.
-%%%%% 7. (Newline(\\)-separated) list of assignments.
-%%%%%
-%%%%% Usage: \B@event[conv]{conc}{abs}{x,y}{G1(x,y)\\G2(x,y)}{W1\\W2}{S1(v,x,y)\\S2(w,x,y)}
-%%%%%       will produce the following
-%%%%%
-%%%%%       conc
-%%%%%       refines abs
-%%%%%       status conv
-%%%%%       any x, y where
-%%%%%         G1(x, y)
-%%%%%         G2(x, y)
-%%%%%       with
-%%%%%         W1
-%%%%%         W2
-%%%%%       then
-%%%%%         S1(v, x, y)
-%%%%%         S2(w, x, y)
-%%%%%       end
-%%%%%
-%%%%% Special case:
-%%%%% - Empty abstract event --> refines clause is omitted.
-%%%%% - Empty convergence status --> status clause is omitted.
-%%%%% - Empty witness --> with clause is omitted.
-%%%%% - Empty parameters, empty guards --> begin ... end
-%%%%% - Empty parameters --> when ... then ... end
-%%%%% - Empty actions --> \SKIP
-\newcommand{\B@ifstrequal}{\expandafter\ifstrequal\expandafter}
-\newcommand{\B@event}[7][]{%
-  { % BEGIN group
-    \newcommand\evt@sts{#1}% Event status
-    \newcommand\evt@label{#2}% Event label
-    \newcommand\evt@absevts{#3}% Abstract event
-    \newcommand\evt@pars{#4}% Event parameters
-    \newcommand\evt@grds{#5}% Event guards
-    \newcommand\evt@wits{#6}% Event witnesses
-    \newcommand\evt@acts{#7}% Event actions
-    %% Pretty-print convergence status
-    \B@ifstrequal{\evt@sts}{}{
-      \newcommand\pretty@sts{}
-    }{
-      \newcommand\pretty@sts{\B@tab\Bstatus \B@tab \evt@sts \\}
-    }
-    % Pretty-print abstract events
-    \B@ifstrequal{\evt@absevts}{}{
-      \newcommand\pretty@absevts{}
-    }{
-      \newcommand\pretty@absevts{\B@tab\Brefines \B@tab \evt@absevts{} \\}%
-    }
-    % Pretty-print parameters
-    \B@ifstrequal{\evt@pars}{}{
-      \newcommand\pretty@pars{}
-    }{
-      \newcommand\pretty@pars{\B@tab\Bany \B@tab \evt@pars \B@tab \Bwhere \\}
-    }
-    % Pretty-print guards
-    \B@ifstrequal{\evt@grds}{}{
-      \newcommand\pretty@grds{}
-    }{
-      \newcommand\pretty@grds@tmp{
-        \begin{array}{@{\B@tab\B@tab}l@{\B@tab}l}
-          \evt@grds
-        \end{array}\\
-      }
-      \B@ifstrequal{\evt@pars}{}{
-        \newcommand\pretty@grds{
-          \B@tab \Bwhen \\
-          \pretty@grds@tmp
-        }
-      }{
-        \newcommand\pretty@grds{\pretty@grds@tmp}
-      }
-    }
-    % Pretty-print witnesses
-    \B@ifstrequal{\evt@wits}{}{
-      \newcommand\pretty@wits{}
-    }{
-      \newcommand\pretty@wits{
-        \B@tab\Bwith\\
-        \begin{array}{@{\B@tab\B@tab}ll}
-          \evt@wits
-        \end{array}\\
-      }
-    }
-    % Pretty-print actions
-    \B@ifstrequal{\evt@acts}{}{
-      \renewcommand\evt@acts{\SKIP}
-    }{}
-    \newcommand\pretty@acts@tmp{
-      \begin{array}{@{\B@tab\B@tab}l@{\B@tab}l}
-        \evt@acts
-      \end{array}\\
-    }
-    \newcommand\pretty@acts@keyword{\B@tab\Bthen \\}
-    \B@ifstrequal{\evt@pars}{}{
-      \B@ifstrequal{\evt@grds}{}{
-        \renewcommand\pretty@acts@keyword{\B@tab\Bbegin \\}
-      }{}
-    }{}
-    \newcommand\pretty@acts{
-      \pretty@acts@keyword
-      \pretty@acts@tmp
-    }
-    % Really do it now
-    \begin{array}{l}
-      \Bevt{\evt@label} \\
-      \pretty@sts
-      \pretty@absevts
-      \pretty@pars
-      \pretty@grds
-      \pretty@wits
-      \pretty@acts
-      \B@tab\Bend
-    \end{array}
-  } % END group
-}
-
-%    \end{macrocode}
 %
 %
 %    \begin{macrocode}
@@ -1030,7 +1166,7 @@
 %%%%% 6. (\land-separated) list of witness predicates.
 %%%%% 7. (||-separated) list of assignments.
 %%%%%
-%%%%% Usage: \B@eventinline[conv]{conc}{abs}{x,y}{G1 \land G2}{W1 \land W2}{S1 || S2}
+%%%%% Usage: \B@inlineeventbase[conv]{conc}{abs}{x,y}{G1 \land G2}{W1 \land W2}{S1 || S2}
 %%%%%       will produce the following
 %%%%%
 %%%%% conc (conv) refines abs = any x,y where G1 \land G2 with W1 \land W2 then S1 || S2 end
@@ -1042,7 +1178,7 @@
 %%%%% - Empty parameters, empty guards --> begin ... end
 %%%%% - Empty parameters --> when ... then ... end
 %%%%% - Empty actions --> \SKIP
-\newcommand{\B@eventinline}[7][]{
+\newcommand{\B@inlineeventbase}[7][]{
   { % BEGIN group
     \newcommand\evt@sts{#1}% Event status
     \newcommand\evt@label{#2}% Event label
@@ -1121,9 +1257,14 @@
 }  
 %    \end{macrocode}
 %
+% \begin{macro}{\INITIALISATION}
+% \changes{v2.0}{2013/02/26}{Renamed from \textbf{init}}
 %    \begin{macrocode}
 %%%%% INITIALISATION label
 \newBevt{INITIALISATION}
+%    \end{macrocode}
+% \end{macro}
+%    \begin{macrocode}
 
 %%%%% Pretty print the initialisation: no ``refines'' clause. no parameters, no
 %%%%% guards
@@ -1142,6 +1283,11 @@
 \newcommand{\initialisation}[1]{
   \event{\INITIALISATION}{}{}{}{}{#1}
 }
+
+\newcommand{\event}[7][]{
+  \B@event[#1]{#2}{#3}{#4}{#5}{#6}{#7}
+}
+
 %    \end{macrocode}
 %
 % \Finale
