@@ -85,6 +85,7 @@
 % \DoNotIndex{\xspace}
 % \DoNotIndex{\def, \csname, \endcsname, \expandafter, \ifstrequal}
 % \DoNotIndex{\land, \widehat}
+% \DoNotIndex{\B@tmp@length}
 %
 % \GetFileInfo{eventB.sty}
 %
@@ -179,6 +180,34 @@
 %   \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
 \newcommand{\B@identifierbase}[1]{\mathit{#1}}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\B@labelbase}
+%   Basic macro for Event-B labels.
+%   \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>%   Event-B labels base
+%   \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\B@labelbase}[2][]{
+  \ifstrequal{#1}{}{
+    \mathsf{#2}
+  }{
+    \mathit{#2}
+  }
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\B@pobase}
+%   Basic macro for Event-B proof obligations.
+%   \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>%   Event-B proof obligations base
+%   \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\B@pobase}[1]{\ensuremath{\mathsf{#1}}\xspace}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -897,42 +926,123 @@
 %<eventB>% Event-B identifiers
 % \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
-\newcommand{\Bidentifier}[1]{\ensuremath{\B@identifierbase{#1}}\xspace}
+\newcommand{\B@identifier}[1]{\ensuremath{\B@identifierbase{#1}}\xspace}
 %    \end{macrocode}
 % \end{macro}
+%
+% \begin{macro}{\B@label}
+%   Macro for Event-B labels.
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB> 
+%<eventB>% Event-B labels
+% \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
-\newcommand{\Blabel}[2][]{\ensuremath{\B@label[#1]{#2}}\xspace}
-\newcommand{\Bpo}[1]{\ensuremath{\B@po{#1}}\xspace}
+\newcommand{\B@label}[2][]{\ensuremath{\B@labelbase[#1]{#2}}\xspace}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\B@po}
+%   Macro for Event-B proof obligations.
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB> 
+%<eventB>% Event-B proof obligations
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\B@po}[1]{\ensuremath{\B@pobase{#1}}\xspace}
+%    \end{macrocode}
+% \end{macro}
+%
+% We redefine the above commands if option |colour| or |color| is
+% enabled.  Furthermore, we define some commands for setting colour
+% for various modelling elements.
+%
+% \paragraph{Option 'colour'} The option |colour| is declared as follows.
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB> 
+%<eventB>% Option 'colour': Redefine above commands
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
 \DeclareOption{colour}{
+%    \end{macrocode}
+%
+% \begin{macro}{\setBKeywordColour}
+%   Utility macro for defining Event-B keywords colour.
+%   \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>   
+%<eventB>  %   Macro for defining Event-B keywords colour
+%   \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
   \newcommand{\setBKeywordColour}[1]{\colorlet{B@keywordcolor}{#1}}
   \setBKeywordColour{blue}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\setBIdentifierColour}
+%   Utility macro for defining Event-B identifiers colour.
+%   \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>   
+%<eventB>  %   Macro for defining Event-B identifiers colour
+%   \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
   \newcommand{\setBIdentifierColour}[1]{\colorlet{B@identifiercolor}{#1}}
   \setBIdentifierColour{blue!50!red}  
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\setBLabelColour}
+%   Utility macro for defining Event-B labels colour.
+%   \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>   
+%<eventB>  %   Macro for defining Event-B labels colour
+%   \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
   \newcommand{\setBLabelColour}[1]{\colorlet{B@labelcolor}{#1}}
   \setBLabelColour{green!50!black}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\setBPOColour}
+%   Utility macro for defining Event-B proof obligations colour.
+%   \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>   
+%<eventB>  %   Macro for defining Event-B proof obligations colour
+%   \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
   \newcommand{\setBPOColour}[1]{\colorlet{B@pocolor}{#1}}
   \setBPOColour{red}
+%    \end{macrocode}
+% \end{macro}
+% We redefine the commands with colours.
+%   \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>   
+%<eventB>  %   Redefine commands
+%   \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
   \renewcommand{\B@keyword}[1]{
     \ensuremath{\textcolor{B@keywordcolor}{\B@keywordbase{#1}}}\xspace
   }
-  \renewcommand{\Bidentifier}[1]{
+  \renewcommand{\B@identifier}[1]{
     \ensuremath{\textcolor{B@identifiercolor}{\B@identifierbase{#1}}}\xspace
   }
-  \renewcommand{\Blabel}[2][]{
-    \ensuremath{\textcolor{B@labelcolor}{\B@label[#1]{#2}}}\xspace
+  \renewcommand{\B@label}[2][]{
+    \ensuremath{\textcolor{B@labelcolor}{\B@labelbase[#1]{#2}}}\xspace
   }
-  \renewcommand{\Bpo}[1]{
-    \ensuremath{\textcolor{B@pocolor}{\B@po{#1}}}\xspace
+  \renewcommand{\B@po}[1]{
+    \ensuremath{\textcolor{B@pocolor}{\B@pobase{#1}}}\xspace
   }
 }
+%    \end{macrocode}
+%
+% \paragraph{Option 'color'} This option is a pointer to |colour|.
+%    \begin{macrocode}
 \DeclareOption{color}{
   \ExecuteOptions{colour}
 }
-
 %    \end{macrocode}
 %
 % After declaration of options, we execute them accordingly. 
 % \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
 %<eventB>%%%%% BEGIN Execution of options %%%%%
 %<eventB>% ========================
 %<eventB>
@@ -1089,18 +1199,18 @@
 % \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
 \newcommand{\Bctx}[1]{\ensuremath{\mathbf{#1}}\xspace}
-\newcommand{\Bset}[1]{\Bidentifier{#1}}
-\newcommand{\Bcst}[1]{\Bidentifier{#1}}
-\newcommand{\Baxm}[1]{\Blabel{#1}}
-\newcommand{\Bthm}[1]{\Blabel[thm]{#1}}
+\newcommand{\Bset}[1]{\B@identifier{#1}}
+\newcommand{\Bcst}[1]{\B@identifier{#1}}
+\newcommand{\Baxm}[1]{\B@label{#1}}
+\newcommand{\Bthm}[1]{\B@label[thm]{#1}}
 
 \newcommand{\Bmch}[1]{\ensuremath{\mathbf{#1}}\xspace}
-\newcommand{\Bvrb}[1]{\Bidentifier{#1}}
-\newcommand{\Binv}[1]{\Blabel{#1}}
-\newcommand{\Bevt}[1]{\Blabel{#1}}
-\newcommand{\Bpar}[1]{\Bidentifier{#1}}
-\newcommand{\Bact}[1]{\Blabel{#1}}
-\newcommand{\Bgrd}[1]{\Blabel{#1}}
+\newcommand{\Bvrb}[1]{\B@identifier{#1}}
+\newcommand{\Binv}[1]{\B@label{#1}}
+\newcommand{\Bevt}[1]{\B@label{#1}}
+\newcommand{\Bpar}[1]{\B@identifier{#1}}
+\newcommand{\Bact}[1]{\B@label{#1}}
+\newcommand{\Bgrd}[1]{\B@label{#1}}
 \newcommand{\Bbap}[1]{\hbox{\sl\bfseries #1}}
 %    \end{macrocode}
 %
@@ -1328,7 +1438,7 @@
 %%%%%
 %%%%% Usage:
 %%%%% - \thmpo{thm} will produce "thm/THM"
-\newcommand{\thmpo}[1]{\Bthm{#1}/\Bpo{THM}}
+\newcommand{\thmpo}[1]{\Bthm{#1}/\B@po{THM}}
 
 %    \end{macrocode}
 %
@@ -1341,7 +1451,7 @@
 %%%%%
 %%%%% Usage:
 %%%%% - \axmwdpo{axm} will produce "axm/WD"
-\newcommand{\axmwdpo}[1]{\Baxm{#1}/\Bpo{WD}}
+\newcommand{\axmwdpo}[1]{\Baxm{#1}/\B@po{WD}}
 
 %    \end{macrocode}
 %
@@ -1355,7 +1465,7 @@
 %%%%%
 %%%%% Usage:
 %%%%% - \invpo{evt}{inv} will produce "evt/inv/INV"
-\newcommand{\invpo}[2]{\Bevt{#1}/\Binv{#2}/\Bpo{INV}}
+\newcommand{\invpo}[2]{\Bevt{#1}/\Binv{#2}/\B@po{INV}}
 
 %    \end{macrocode}
 %
@@ -1370,7 +1480,7 @@
 %%%%%
 %%%%% Usage:
 %%%%% - \grdthmpo{evt}{thm} will produce "evt/thm/THM"
-\newcommand{\grdthmpo}[2]{\Bevt{#1}/\Bthm{#2}/\Bpo{THM}}
+\newcommand{\grdthmpo}[2]{\Bevt{#1}/\Bthm{#2}/\B@po{THM}}
 
 %    \end{macrocode}
 %
@@ -1385,7 +1495,7 @@
 %%%%%
 %%%%% Usage:
 %%%%% - \fispo{evt}{act} will produce "evt/act/FIS"
-\newcommand{\fispo}[2]{\Bevt{#1}/\Bact{#2}/\Bpo{FIS}}
+\newcommand{\fispo}[2]{\Bevt{#1}/\Bact{#2}/\B@po{FIS}}
 
 %    \end{macrocode}
 %
@@ -1397,7 +1507,7 @@
 %%%%%
 %%%%% Usage:
 %%%%% - \finpo will produce "FIN"
-\newcommand{\finpo}{\Bpo{FIN}}
+\newcommand{\finpo}{\B@po{FIN}}
 
 %    \end{macrocode}
 %
@@ -1411,7 +1521,7 @@
 %%%%%
 %%%%% Usage:
 %%%%% - \grdpo{evt} will produce "evt/VAR"
-\newcommand{\varpo}[1]{\Bevt{#1}/\Bpo{VAR}}
+\newcommand{\varpo}[1]{\Bevt{#1}/\B@po{VAR}}
 
 %    \end{macrocode}
 %
@@ -1427,7 +1537,7 @@
 %%%%%
 %%%%% Usage:
 %%%%% - \simpo{evt}{act} will produce "evt/act/SIM"
-\newcommand{\simpo}[2]{\Bevt{#1}/\Bact{#2}/\Bpo{SIM}}
+\newcommand{\simpo}[2]{\Bevt{#1}/\Bact{#2}/\B@po{SIM}}
 
 %    \end{macrocode}
 %
@@ -1441,7 +1551,7 @@
 %%%%%
 %%%%% Usage:
 %%%%% - \grdpo{evt}{grd} will produce "evt/grd/GRD"
-\newcommand{\grdpo}[2]{\Bevt{#1}/\Bgrd{#2}/\Bpo{GRD}}
+\newcommand{\grdpo}[2]{\Bevt{#1}/\Bgrd{#2}/\B@po{GRD}}
 
 %    \end{macrocode}
 %
@@ -1455,7 +1565,7 @@
 %%%%%
 %%%%% Usage:
 %%%%% - \natpo{evt} will produce "evt/NAT"
-\newcommand{\natpo}[1]{\Bevt{#1}/\Bpo{NAT}}
+\newcommand{\natpo}[1]{\Bevt{#1}/\B@po{NAT}}
 
 %    \end{macrocode}
 
@@ -1470,20 +1580,12 @@
 % \end{macro}
 
 %    \begin{macrocode}
-\newcommand{\B@label}[2][]{
-  \ifstrequal{#1}{}{
-    \mathsf{#2}
-  }{
-    \mathit{#2}
-  }
-}
 
 
 
 
 
 
-\newcommand{\B@po}[1]{\ensuremath{\mathsf{#1}}\xspace}
 
 %    \end{macrocode}
 %
@@ -1543,6 +1645,8 @@
 \let\event\B@event
 \let\Bvspace\B@vspace
 \let\Bhspace\B@hspace
+\let\Bpo\B@po
+
 %    \end{macrocode}
 %
 % \Finale
