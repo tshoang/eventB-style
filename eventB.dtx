@@ -25,6 +25,7 @@
 % 
 % \iffalse
 %<eventB>%%%%% BEGIN Identification part %%%%%
+%<eventB>% ========================
 %<eventB>\NeedsTeXFormat{LaTeX2e}\relax
 %<eventB>\ProvidesPackage{eventB}
 %<eventB>    [2012/02/21 v1.1.1 Package for typesetting Event-B models] 
@@ -139,6 +140,7 @@
 % \iffalse ^^A BEGIN Produce comments only in the resulting class file
 %<eventB>
 %<eventB>%%%%% BEGIN Package loading %%%%%
+%<eventB>% ========================
 % \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
 \RequirePackage{xspace}
@@ -154,6 +156,7 @@
 % \iffalse ^^A BEGIN Produce comments only in the resulting class file
 %<eventB>
 %<eventB>%%%%% BEGIN Helper Macros %%%%%
+%<eventB>% ========================
 % \fi^^A END Produce comments only in the resulting class file
 % We define same basic helper macros that will be used to defined
 % other macros.
@@ -549,14 +552,24 @@
 % \begin{macro}{\B@makebox}
 %   \changes{v2.0}{2013/02/26}{Added}
 %   A wrapper macro to make a |fbox| with the boundary adjusted. 
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB> 
+%<eventB>% A temporary macros to save and restore length
+% \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
-\newlength{\B@tmplength}
+\newlength{\B@tmp@length}
+%    \end{macrocode}
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB> 
+%<eventB>% Make a bounding box
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
 \newcommand{\B@makebox}[1]{
   {
-    \setlength{\B@tmplength}{\fboxsep}
+    \setlength{\B@tmp@length}{\fboxsep}
     \setlength{\fboxsep}{2ex}
     \fbox{#1}
-    \setlength{\fboxsep}{\B@tmplength}
+    \setlength{\fboxsep}{\B@tmp@length}
   }
 }
 %    \end{macrocode}
@@ -572,13 +585,16 @@
 % \iffalse ^^A BEGIN Produce comments only in the resulting class file
 %<eventB>
 %<eventB>%%%%% BEGIN Declaration of options %%%%%
+%<eventB>% ========================
 % \fi^^A END Produce comments only in the resulting class file
 % In this part various options for the package are defined.
 %
-% \paragraph{Option for bounding boxes}
+% \subsubsection{Option for bounding boxes}
+% \label{sec:opti-bound-boxes}
 % \iffalse ^^A BEGIN Produce comments only in the resulting class file
 %<eventB> 
-%<eventB>% Options for no bounding box %
+%<eventB>%%% Options for no bounding box %%%
+%<eventB>% ------------------------
 % \fi^^A END Produce comments only in the resulting class file
 % By default, \eventB modelling elements, e.g., invariants, events,
 % etc., are displayed in a bounding box.  This |nobox| option enables them to
@@ -587,6 +603,10 @@
 % \begin{macro}{\B@event}
 %   \changes{v1.0.1}{2013/02/19}{Ensure math-mode}
 %   Default definition displays Event-B events in a box.
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB> 
+%<eventB>% Pretty-print Event-B events
+% \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
 \newcommand{\B@event}[7][]{
   \B@makebox{
@@ -600,6 +620,10 @@
 % \begin{macro}{\B@declaration}
 %   \changes{v1.0.1}{2013/02/19}{Ensure math-mode}
 %   Default definition displays Event-B declarations in a box.
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB> 
+%<eventB>% Event-B declarations (e.g. variables, constants)
+% \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
 \newcommand{\B@declaration}[2]{
   \B@makebox{
@@ -613,6 +637,10 @@
 % \begin{macro}{\B@section}
 %   \changes{v1.0.1}{2013/02/19}{Ensure math-mode}
 %   Default definition displays Event-B sections in a box
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB> 
+%<eventB>% Event-B sections (e.g. invariants, axioms)
+% \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
 \newcommand{\B@section}[3][]{
   \B@makebox{
@@ -624,7 +652,11 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% The above commands are redefined accordingly when option |nobox| is enabled.
+% \paragraph{Option ``nobox''} The above commands are redefined accordingly when option |nobox| is enabled.
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB> 
+%<eventB>% Option 'nobox': Redefine above commands
+% \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
 \DeclareOption{nobox}{
 %    \end{macrocode}
@@ -655,67 +687,220 @@
 }
 %    \end{macrocode}  
 % \end{macro}
-
-
-% \paragraph{Options for font size and spacing}
+%
+% \subsubsection{Options for font size and spacing}
+% \label{sec:options-font-size}
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB> 
+%<eventB>%%% Options for font size and spacing %%%
+%<eventB>% ------------------------
+% \fi^^A END Produce comments only in the resulting class file
 % We define the default values for font size and some spacing
 % commands, and how the are redefined according to options |small|,
 % |compact|, and |tiny|. In particular, option |compact| and |tiny|
 % implies option |nobox|.
-
+% \begin{macro}{\B@fontsize}
+%   The font size used in the |Bcode| environment (defined later).
 % \iffalse ^^A BEGIN Produce comments only in the resulting class file
 %<eventB> 
-%<eventB>% Options for font size and spacing %
+%<eventB>% The font size used in Bcode environment, defaulted to be |\normalsize|.
 % \fi^^A END Produce comments only in the resulting class file
-
 %    \begin{macrocode}
-\newcommand{\B@fontsize}{\normalsize} % The font size used in Bcode environment
-\newcommand{\Bvspace}[1][2ex]{\\[#1]} % Vertical space
-\newcommand{\Bhspace}[1][2em]{\hspace{#1}} % Horizontal space
-\newcommand{\B@tab}{\quad} % A small separation space
-
-\DeclareOption{small}{
-  \renewcommand{\B@fontsize}{\small}
-  \renewcommand{\Bvspace}[1][1ex]{\\[#1]}
-  \renewcommand{\Bhspace}[1][1em]{\hspace{#1}}
-  \renewcommand{\B@tab}{\ }
-}
-\DeclareOption{compact}{
-  \renewcommand{\B@fontsize}{\footnotesize}
-  \renewcommand{\Bvspace}[1][0ex]{\\[#1]}
-  \renewcommand{\Bhspace}[1][0.5em]{\hspace{#1}}
-  \renewcommand{\B@tab}{\ }
-  \ExecuteOptions{nobox}
-}
-\DeclareOption{tiny}{
-  \renewcommand{\B@fontsize}{\scriptsize}
-  \renewcommand{\Bvspace}[1][-0.5ex]{\\[#1]}
-  \renewcommand{\Bhspace}[1][0.5em]{\hspace{#1}}
-  \renewcommand{\B@tab}{\ }
-  \ExecuteOptions{nobox}
-}
-
+\newcommand{\B@fontsize}{\normalsize}
 %    \end{macrocode}
-
-% \paragraph{Options for colouring}
+% \end{macro}
+%
+% \begin{macro}{\B@vspace}
+%   A vertical rule for spacing, defaulted to be |2ex|.
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB> 
+%<eventB>% Vertical spacing
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\B@vspace}[1][2ex]{\\[#1]}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\B@hspace}
+%   A horizontal rule for spacing, defaulted to be |2em|.
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB> 
+%<eventB>% Horizontal spacing
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\B@hspace}[1][2em]{\hspace{#1}}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\B@tab}
+%   A small tab for spacing, defaulted to be |\quad|.
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB> 
+%<eventB>% A small tab
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\B@tab}{\quad} % A small separation space
+%    \end{macrocode}
+% \end{macro}
+%
+% We subsequently redefined the above spacing commands when one of the
+% options |small|, |compact|, |tiny| is enabled.
+%
+% \paragraph{Option ``small''} For option |small| they are adjusted as follows.
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB> 
+%<eventB>% Option 'small': Redefine above commands
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\DeclareOption{small}{
+%    \end{macrocode}
+% \begin{macro}{\B@fontsize}
+%   Redefine to be |\small| for option |small|.
+%    \begin{macrocode}
+  \renewcommand{\B@fontsize}{\small}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\B@vspace}
+%   Redefine to be |1ex| for option |small|.
+%    \begin{macrocode}
+  \renewcommand{\B@vspace}[1][1ex]{\\[#1]}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\B@hspace}
+%   Redefine to be |1em| for option |small|.
+%    \begin{macrocode}
+  \renewcommand{\B@hspace}[1][1em]{\hspace{#1}}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\B@tab}
+%   Redefine to be |\ | for option |small|.
+%    \begin{macrocode}
+  \renewcommand{\B@tab}{\ }
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \paragraph{Option ``compact''} For option |compact| the commands are adjusted as follows.
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB> 
+%<eventB>% Option 'compact': Redefine above commands
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\DeclareOption{compact}{
+%    \end{macrocode}
+% \begin{macro}{\B@fontsize}
+%   Redefine to be |\footnotesize| for option |compact|.
+%    \begin{macrocode}
+  \renewcommand{\B@fontsize}{\footnotesize}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\B@vspace}
+%   Redefine to be |0ex| for option |compact|.
+%    \begin{macrocode}
+  \renewcommand{\B@vspace}[1][0ex]{\\[#1]}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\B@hspace}
+%   Redefine to be |0.5em| for option |compact|.
+%    \begin{macrocode}
+  \renewcommand{\B@hspace}[1][0.5em]{\hspace{#1}}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\B@tab}
+%   Redefine to be |\ | for option |compact|.
+%    \begin{macrocode}
+  \renewcommand{\B@tab}{\ }
+%    \end{macrocode}
+% \end{macro}
+% Option |nobox| is enabled.
+%    \begin{macrocode}
+  \ExecuteOptions{nobox}
+}
+%    \end{macrocode}
+%
+% \paragraph{Option ``tiny''} For option |tiny| the commands are adjusted as follows.
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB> 
+%<eventB>% Option 'tiny': Redefine above commands
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\DeclareOption{tiny}{
+%    \end{macrocode}
+% \begin{macro}{\B@fontsize}
+%   Redefine to be |\scriptsize| for option |tiny|.
+%    \begin{macrocode}
+  \renewcommand{\B@fontsize}{\scriptsize}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\B@vspace}
+%   Redefine to be |-0.5ex| for option |tiny|.
+%    \begin{macrocode}
+  \renewcommand{\B@vspace}[1][-0.5ex]{\\[#1]}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\B@hspace}
+%   Redefine to be |0.5em| for option |compact|.
+%    \begin{macrocode}
+  \renewcommand{\B@hspace}[1][0.5em]{\hspace{#1}}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\B@tab}
+%   Redefine to be |\ | for option |compact|.
+%    \begin{macrocode}
+  \renewcommand{\B@tab}{\ }
+%    \end{macrocode}
+% \end{macro}
+% Option |nobox| is enabled.
+%    \begin{macrocode}
+  \ExecuteOptions{nobox}
+}
+%    \end{macrocode}
+%
+% \subsubsection{Options for colouring}
+% \label{sec:options-colouring}
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>%%% Options for colouring %%%
+%<eventB>% ------------------------
+% \fi^^A END Produce comments only in the resulting class file
 % Keywords, labels and identifiers in Event-B can be coloured. We
 % define several commands and redefine them accordingly for
 % colouring.  When |colour| (or |color|) option is enabled, one can
 % customise the colours for Event-B keywords, labels or identifier or
-% proof obligation labels.
-
+% proof obligation labels.  We proceed with some definitions that can
+% be redefined by these options.
+%
+% \begin{macro}{\B@keyword}
+%   Macro for Event-B keywords.
 % \iffalse ^^A BEGIN Produce comments only in the resulting class file
-%<eventB>
-%<eventB>% Options for colouring %
+%<eventB> 
+%<eventB>% Event-B keywords
 % \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
-%<*eventB>
-% Default definition for Event-B keywords
-%</eventB>
 \newcommand{\B@keyword}[1]{\ensuremath{\B@keywordbase{#1}}\xspace} 
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\B@identifier}
+%   Macro for Event-B identifiers.
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB> 
+%<eventB>% Event-B identifiers
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
 \newcommand{\Bidentifier}[1]{\ensuremath{\B@identifierbase{#1}}\xspace}
-% Default definition for Event-B identifiers
-
+%    \end{macrocode}
+% \end{macro}
+%    \begin{macrocode}
 \newcommand{\Blabel}[2][]{\ensuremath{\B@label[#1]{#2}}\xspace}
 \newcommand{\Bpo}[1]{\ensuremath{\B@po{#1}}\xspace}
 \DeclareOption{colour}{
@@ -749,6 +934,7 @@
 % After declaration of options, we execute them accordingly. 
 % \iffalse ^^A BEGIN Produce comments only in the resulting class file
 %<eventB>%%%%% BEGIN Execution of options %%%%%
+%<eventB>% ========================
 %<eventB>
 % \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
@@ -758,20 +944,14 @@
 %<eventB>%%%%% END Execution of options %%%%%
 %<eventB>
 % \fi^^A END Produce comments only in the resulting class file
-
-% \iffalse ^^A BEGIN Produce comments only in the resulting class file
-%<eventB>%%%%% END Declaration of options %%%%%
-%<eventB>
-% \fi^^A END Produce comments only in the resulting class file
-
 %
-
 % \subsection{Commands for Pretty-Print Event-B Models}
 % \label{sec:comm-pretty-print}
 
 % \iffalse ^^A BEGIN Produce comments only in the resulting class file
 %<eventB>
 %<eventB>%%%%% BEGIN Commands for Pretty-Print Event-B Models %%%%%
+%<eventB>% ========================
 % \fi^^A END Produce comments only in the resulting class file
 
 % We start with the definition of the |\eventB| macro.
@@ -929,6 +1109,7 @@
 % \iffalse ^^A BEGIN Produce comments only in the resulting class file
 %<eventB>
 %<eventB>%%%%% BEGIN Creating Event-B modelling elements macros %%%%%
+%<eventB>% ========================
 % \fi^^A END Produce comments only in the resulting class file
 % We define meta-marcos to create macros for different modelling
 % elements.
@@ -1355,10 +1536,13 @@
   \event{\INITIALISATION}{}{}{}{}{#1}
 }
 
-\newcommand{\event}[7][]{
-  \B@event[#1]{#2}{#3}{#4}{#5}{#6}{#7}
-}
+%\newcommand{\event}[7][]{
+%  \B@event[#1]{#2}{#3}{#4}{#5}{#6}{#7}
+%}
 
+\let\event\B@event
+\let\Bvspace\B@vspace
+\let\Bhspace\B@hspace
 %    \end{macrocode}
 %
 % \Finale

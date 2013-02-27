@@ -21,18 +21,21 @@
 %% version 2003/12/01 or later.
 %% 
 %%%%% BEGIN Identification part %%%%%
+% ========================
 \NeedsTeXFormat{LaTeX2e}\relax
 \ProvidesPackage{eventB}
     [2012/02/21 v1.1.1 Package for typesetting Event-B models]
 %%%%% END Identification part %%%%%
 
 %%%%% BEGIN Package loading %%%%%
+% ========================
 \RequirePackage{xspace}
 \RequirePackage{xcolor}
 \RequirePackage{etoolbox}
 %%%%% END Package loading %%%%%
 
 %%%%% BEGIN Helper Macros %%%%%
+% ========================
 
 %   Event-B keywords base
 \newcommand{\B@keywordbase}[1]{\mathbf{#1}}
@@ -288,21 +291,29 @@
     \end{array}
   } % END group
 }
-\newlength{\B@tmplength}
+
+% A temporary macros to save and restore length
+\newlength{\B@tmp@length}
+
+% Make a bounding box
 \newcommand{\B@makebox}[1]{
   {
-    \setlength{\B@tmplength}{\fboxsep}
+    \setlength{\B@tmp@length}{\fboxsep}
     \setlength{\fboxsep}{2ex}
     \fbox{#1}
-    \setlength{\fboxsep}{\B@tmplength}
+    \setlength{\fboxsep}{\B@tmp@length}
   }
 }
 
 %%%%% END Helper Macros %%%%%
 
 %%%%% BEGIN Declaration of options %%%%%
+% ========================
 
-% Options for no bounding box %
+%%% Options for no bounding box %%%
+% ------------------------
+
+% Pretty-print Event-B events
 \newcommand{\B@event}[7][]{
   \B@makebox{
     \ensuremath{
@@ -310,6 +321,8 @@
     }
   }
 }
+
+% Event-B declarations (e.g. variables, constants)
 \newcommand{\B@declaration}[2]{
   \B@makebox{
     \ensuremath{
@@ -317,6 +330,8 @@
     }
   }
 }
+
+% Event-B sections (e.g. invariants, axioms)
 \newcommand{\B@section}[3][]{
   \B@makebox{
     \ensuremath{
@@ -324,6 +339,8 @@
     }
   }
 }
+
+% Option 'nobox': Redefine above commands
 \DeclareOption{nobox}{
   \renewcommand{\B@event}[7][]{
     \B@eventbase[#1]{#2}{#3}{#4}{#5}{#6}{#7}
@@ -336,43 +353,55 @@
   }
 }
 
+%%% Options for font size and spacing %%%
+% ------------------------
 
+% The font size used in Bcode environment, defaulted to be |\normalsize|.
+\newcommand{\B@fontsize}{\normalsize}
 
-% Options for font size and spacing %
+% Vertical spacing
+\newcommand{\B@vspace}[1][2ex]{\\[#1]}
 
-\newcommand{\B@fontsize}{\normalsize} % The font size used in Bcode environment
-\newcommand{\Bvspace}[1][2ex]{\\[#1]} % Vertical space
-\newcommand{\Bhspace}[1][2em]{\hspace{#1}} % Horizontal space
+% Horizontal spacing
+\newcommand{\B@hspace}[1][2em]{\hspace{#1}}
+
+% A small tab
 \newcommand{\B@tab}{\quad} % A small separation space
 
+% Option 'small': Redefine above commands
 \DeclareOption{small}{
   \renewcommand{\B@fontsize}{\small}
-  \renewcommand{\Bvspace}[1][1ex]{\\[#1]}
-  \renewcommand{\Bhspace}[1][1em]{\hspace{#1}}
+  \renewcommand{\B@vspace}[1][1ex]{\\[#1]}
+  \renewcommand{\B@hspace}[1][1em]{\hspace{#1}}
   \renewcommand{\B@tab}{\ }
 }
+
+% Option 'compact': Redefine above commands
 \DeclareOption{compact}{
   \renewcommand{\B@fontsize}{\footnotesize}
-  \renewcommand{\Bvspace}[1][0ex]{\\[#1]}
-  \renewcommand{\Bhspace}[1][0.5em]{\hspace{#1}}
+  \renewcommand{\B@vspace}[1][0ex]{\\[#1]}
+  \renewcommand{\B@hspace}[1][0.5em]{\hspace{#1}}
   \renewcommand{\B@tab}{\ }
   \ExecuteOptions{nobox}
 }
+
+% Option 'tiny': Redefine above commands
 \DeclareOption{tiny}{
   \renewcommand{\B@fontsize}{\scriptsize}
-  \renewcommand{\Bvspace}[1][-0.5ex]{\\[#1]}
-  \renewcommand{\Bhspace}[1][0.5em]{\hspace{#1}}
+  \renewcommand{\B@vspace}[1][-0.5ex]{\\[#1]}
+  \renewcommand{\B@hspace}[1][0.5em]{\hspace{#1}}
   \renewcommand{\B@tab}{\ }
   \ExecuteOptions{nobox}
 }
 
+%%% Options for colouring %%%
+% ------------------------
 
-
-
-% Options for colouring %
+% Event-B keywords
 \newcommand{\B@keyword}[1]{\ensuremath{\B@keywordbase{#1}}\xspace}
-\newcommand{\Bidentifier}[1]{\ensuremath{\B@identifierbase{#1}}\xspace}
 
+% Event-B identifiers
+\newcommand{\Bidentifier}[1]{\ensuremath{\B@identifierbase{#1}}\xspace}
 \newcommand{\Blabel}[2][]{\ensuremath{\B@label[#1]{#2}}\xspace}
 \newcommand{\Bpo}[1]{\ensuremath{\B@po{#1}}\xspace}
 \DeclareOption{colour}{
@@ -402,18 +431,15 @@
 }
 
 %%%%% BEGIN Execution of options %%%%%
+% ========================
 
 \ProcessOptions
 %%%%% END Execution of options %%%%%
 
 
-%%%%% END Declaration of options %%%%%
-
-
-
-
 
 %%%%% BEGIN Commands for Pretty-Print Event-B Models %%%%%
+% ========================
 
 \newcommand{\eventB}{Event-B\xspace}
 
@@ -506,6 +532,7 @@
 \newcommand{\Bbap}[1]{\hbox{\sl\bfseries #1}}
 
 %%%%% BEGIN Creating Event-B modelling elements macros %%%%%
+% ========================
 
 % Create a new B macro
 % Arguments:
@@ -798,10 +825,10 @@
   \event{\INITIALISATION}{}{}{}{}{#1}
 }
 
-\newcommand{\event}[7][]{
-  \B@event[#1]{#2}{#3}{#4}{#5}{#6}{#7}
-}
 
+\let\event\B@event
+\let\Bvspace\B@vspace
+\let\Bhspace\B@hspace
 \endinput
 %%
 %% End of file `eventB.sty'.
