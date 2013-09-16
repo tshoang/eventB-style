@@ -261,7 +261,7 @@
         \evt@grds~
       }
       \B@ifstrequal{\evt@pars}{}{
-        \Bwhen~\pretty@grds@tmp
+        \newcommand\pretty@grds{\Bwhen~\pretty@grds@tmp}
       }{
         \newcommand\pretty@grds{\pretty@grds@tmp}
       }
