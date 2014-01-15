@@ -2,7 +2,7 @@
 % 
 % eventB.ins
 % 
-% Copyright (C) 2012 by Thai Son Hoang <htson at inf dot ethz dot ch>
+% Copyright (C) 2012-2014 by Thai Son Hoang <htson at inf dot ethz dot ch>
 % --------------------------------------------------------------------
 % 
 % This file may be distributed and/or modified under the
@@ -28,7 +28,7 @@
 %<eventB>% ========================
 %<eventB>\NeedsTeXFormat{LaTeX2e}\relax
 %<eventB>\ProvidesPackage{eventB}
-%<eventB>    [2012/02/21 v1.1.1 Package for typesetting Event-B models] 
+%<eventB>    [2014/01/14 v2.0 Package for typesetting Event-B models] 
 %<eventB>%%%%% END Identification part %%%%%
 % 
 %<*driver> 
@@ -152,20 +152,34 @@
 %<eventB>%%%%% END Package loading %%%%%
 % \fi^^A END Produce comments only in the resulting class file
 %
-% \subsection{Helper Macros}
-% \label{sec:helper-functions}
+% \subsection{Internal Helper Macros}
+% \label{sec:internal-helper-macros}
 % \iffalse ^^A BEGIN Produce comments only in the resulting class file
 %<eventB>
-%<eventB>%%%%% BEGIN Helper Macros %%%%%
+%<eventB>%%%%% BEGIN Internal Helper Macros %%%%%
 %<eventB>% ========================
 % \fi^^A END Produce comments only in the resulting class file
-% We define same basic helper macros that will be used to defined
+% We define same basic internal helper macros that will be used to defined
 % other macros.
+%
+% \begin{macro}{\B@ifstrequal}
+%   A utility wrapper for \ifstrequal to make sure that the first argument is properly expanded.
+%   \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>   
+%<eventB>%   A wrapper for \ifstrequal to make sure that the first argument is properly expanded
+%   \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\B@ifstrequal}{\expandafter\ifstrequal\expandafter}
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}{\B@keywordbase}
 %   Basic macro for Event-B keywords.
 %   \iffalse ^^A BEGIN Produce comments only in the resulting class file
-%<eventB>
-%<eventB>%   Event-B keywords base
+%<eventB>   
+%<eventB>%   Event-B keywords base.
+%<eventB>%   Arguments:
+%<eventB>%   1. The keyword.
 %   \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
 \newcommand{\B@keywordbase}[1]{\mathbf{#1}}
@@ -175,8 +189,10 @@
 % \begin{macro}{\B@identifierbase}
 %   Basic macro for Event-B identifiers.
 %   \iffalse ^^A BEGIN Produce comments only in the resulting class file
-%<eventB>
-%<eventB>%   Event-B identifiers base
+%<eventB>   
+%<eventB>%   Event-B identifiers base.
+%<eventB>%   Arguments:
+%<eventB>%   1. The identifier.
 %   \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
 \newcommand{\B@identifierbase}[1]{\mathit{#1}}
@@ -186,78 +202,94 @@
 % \begin{macro}{\B@labelbase}
 %   Basic macro for Event-B labels.
 %   \iffalse ^^A BEGIN Produce comments only in the resulting class file
-%<eventB>
-%<eventB>%   Event-B labels base
+%<eventB>   
+%<eventB>%   Event-B labels base.
+%<eventB>%   Arguments:
+%<eventB>%   1. (Optional) Non-empty value indicating the label is a theorem label.
+%<eventB>%   2. The label.
 %   \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
-\newcommand{\B@labelbase}[2][]{
-  \ifstrequal{#1}{}{
+\newcommand{\B@labelbase}[2][]{%
+  \ifstrequal{#1}{}{%
     \mathsf{#2}
-  }{
+  }{%
     \mathit{#2}
   }
 }
 %    \end{macrocode}
 % \end{macro}
 %
+%
+% \begin{macro}{\B@constructbase}
+%   Basic macro for Event-B constructs.
+%   \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>   
+%<eventB>%   Event-B constructs base.
+%<eventB>%   Arguments:
+%<eventB>%   1. The construct name.
+%   \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\B@constructbase}[1]{\mathsf{#1}}
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}{\B@pobase}
 %   Basic macro for Event-B proof obligations.
 %   \iffalse ^^A BEGIN Produce comments only in the resulting class file
-%<eventB>
-%<eventB>%   Event-B proof obligations base
+%<eventB>   
+%<eventB>%   Event-B proof obligations base.
+%<eventB>%   Arguments:
+%<eventB>%   1. The proof obligation name.
 %   \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
-\newcommand{\B@pobase}[1]{\ensuremath{\mathsf{#1}}\xspace}
+\newcommand{\B@pobase}[1]{\mathsf{#1}}
 %    \end{macrocode}
 % \end{macro}
 %
 % \begin{macro}{\B@declarationbase}
-%   Basic macro for Event-B declarations (e.g., variables, constants, etc.).
+%   Basic macro for Event-B declarations (e.g., constants, variables, etc.).
 %   \iffalse ^^A BEGIN Produce comments only in the resulting class file
-%<eventB>
-%<eventB>%   Event-B declaration (e.g., variables, constants, etc.) base
+%<eventB>   
+%<eventB>%   Event-B declaration (e.g., constants, variables, etc.) base
+%<eventB>%   Arguments:
+%<eventB>%   1. The keyword of the declaration.
+%<eventB>%   2. The declaration.
 %   \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
-\newcommand{\B@declarationbase}[2]{
-  \begin{array}{l@{\B@tab}l}
-    \B@keyword{#1:} &  #2 
+\newcommand{\B@declarationbase}[2]{%
+  \begin{array}{@{}l@{\B@tab}l@{}}
+    \B@keyword{#1:} & #2 
   \end{array}
 }
 %    \end{macrocode}
 % \end{macro}
 %
 % \begin{macro}{\B@sectionbase}
-%   Basic macro for Event-B sections (e.g., invariants, axioms, etc.).
+%   Basic macro for Event-B sections (e.g., axioms, invariants,
+%   etc.).  The optional argument is to produce the keywords or not
 %   \iffalse ^^A BEGIN Produce comments only in the resulting class file
 %<eventB>
-%<eventB>%   Event-B sections (e.g., variables, constants, etc.) base
+%<eventB>%   Event-B sections (e.g., axioms, invariants, etc.) base
+%<eventB>%   Arguments:
+%<eventB>%   1. (Optional) Non-empty indicating the keyword is omitted.
+%<eventB>%   2. The keyword of the section.
+%<eventB>%   3. The section content.
 %   \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
-\newcommand{\B@sectionbase}[3][]{
+\newcommand{\B@sectionbase}[3][]{%
   \ifstrequal{#1}{}{
-    \begin{array}{l}
+    \begin{array}{@{}l@{}}
       \B@keyword{#2:} \\
-      \begin{array}{l@{\B@tab}l}
+      \begin{array}{@{\B@tab}l@{\B@tab}l@{}}
         #3
       \end{array}
     \end{array}
   }{
-    \begin{array}{l@{\B@tab}l}
+    \begin{array}{@{\B@tab}l@{\B@tab}l@{\B@tab}}
       #3
     \end{array}
   }
 }
-%    \end{macrocode}
-% \end{macro}
-%
-% \begin{macro}{\B@ifstrequal}
-%   A wrapper for \ifstrequal to make sure that the first argument is properly expanded.
-%   \iffalse ^^A BEGIN Produce comments only in the resulting class file
-%<eventB>
-%<eventB>%   A wrapper for \ifstrequal to make sure that the first argument is properly expanded
-%   \fi^^A END Produce comments only in the resulting class file
-%    \begin{macrocode}
-\newcommand{\B@ifstrequal}{\expandafter\ifstrequal\expandafter}
 %    \end{macrocode}
 % \end{macro}
 %
@@ -333,7 +365,7 @@
     \B@ifstrequal{\evt@absevts}{}{
       \newcommand\pretty@absevts{}
     }{
-      \newcommand\pretty@absevts{\B@tab\Brefines \B@tab \evt@absevts{} \\}
+      \newcommand\pretty@absevts{\B@tab \Brefines \B@tab \evt@absevts{} \\}
     }
 %    \end{macrocode}
 % The parameters is skipped if there are none.
@@ -344,7 +376,7 @@
     \B@ifstrequal{\evt@pars}{}{
       \newcommand\pretty@pars{}
     }{
-      \newcommand\pretty@pars{\B@tab\Bany \B@tab \evt@pars \B@tab \Bwhere \\}
+      \newcommand\pretty@pars{\B@tab \Bany \B@tab \evt@pars \B@tab \Bwhere \\}
     }
 %    \end{macrocode}
 % The keywords for guards also depends on if there are parameters or not.
@@ -416,7 +448,7 @@
 %<eventB>    % Putting the pieces together
 % \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
-    \begin{array}{l}
+    \begin{array}{@{}l@{}}
       \Bevt{\evt@label} \\
       \pretty@sts
       \pretty@absevts
@@ -565,14 +597,12 @@
 %<eventB>    % Putting the pieces together
 % \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
-    \begin{array}{l}
       \Bevt{\evt@label}\pretty@sts\pretty@absevts~\widehat{=}~
       \pretty@pars
       \pretty@grds
       \pretty@wits
       \pretty@acts
       \Bend
-    \end{array}
   } % END group
 }  
 %    \end{macrocode}
@@ -606,7 +636,7 @@
 %
 % \iffalse ^^A BEGIN Produce comments only in the resulting class file
 %<eventB>
-%<eventB>%%%%% END Helper Macros %%%%%
+%<eventB>%%%%% END Internal Helper Macros %%%%%
 % \fi^^A END Produce comments only in the resulting class file
 %
 % \subsection{Declaration of Options for the Package}
@@ -655,8 +685,8 @@
 % \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
 \newcommand{\B@declaration}[2]{
-  \B@makebox{
-    \ensuremath{
+  \B@makebox{%
+    \ensuremath{%
       \B@declarationbase{#1}{#2}
     }
   }
@@ -672,8 +702,8 @@
 % \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
 \newcommand{\B@section}[3][]{
-  \B@makebox{
-    \ensuremath{
+  \B@makebox{%
+    \ensuremath{%
       \B@sectionbase[#1]{#2}{#3}
     }
   }
@@ -692,7 +722,7 @@
 % \begin{macro}{\B@event}
 %   Redefine the definition without the bounding box.
 %    \begin{macrocode}
-  \renewcommand{\B@event}[7][]{
+  \renewcommand{\B@event}[7][]{%
     \B@eventbase[#1]{#2}{#3}{#4}{#5}{#6}{#7}
   }
 %    \end{macrocode}
@@ -941,6 +971,17 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{\B@construct}
+%   Macro for Event-B constructs.
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB> 
+%<eventB>% Event-B constructs
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\B@construct}[1]{\ensuremath{\B@constructbase{#1}}\xspace}
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}{\B@po}
 %   Macro for Event-B proof obligations.
 % \iffalse ^^A BEGIN Produce comments only in the resulting class file
@@ -1001,6 +1042,18 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{\setBConstructColour}
+%   Utility macro for defining Event-B constructs colour.
+%   \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>   
+%<eventB>  %   Macro for defining Event-B constructs colour
+%   \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+  \newcommand{\setBConstructColour}[1]{\colorlet{B@constructcolor}{#1}}
+  \setBConstructColour{orange!75!black}  
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}{\setBPOColour}
 %   Utility macro for defining Event-B proof obligations colour.
 %   \iffalse ^^A BEGIN Produce comments only in the resulting class file
@@ -1026,6 +1079,9 @@
   }
   \renewcommand{\B@label}[2][]{
     \ensuremath{\textcolor{B@labelcolor}{\B@labelbase[#1]{#2}}}\xspace
+  }
+  \renewcommand{\B@construct}[1]{
+    \ensuremath{\textcolor{B@constructcolor}{\B@constructbase{#1}}}\xspace
   }
   \renewcommand{\B@po}[1]{
     \ensuremath{\textcolor{B@pocolor}{\B@pobase{#1}}}\xspace
@@ -1055,170 +1111,10 @@
 %<eventB>
 % \fi^^A END Produce comments only in the resulting class file
 %
-% \subsection{Commands for Pretty-Print Event-B Models}
-% \label{sec:comm-pretty-print}
-
+% \subsection{Meta-macros for creating macros for modelling elements}
 % \iffalse ^^A BEGIN Produce comments only in the resulting class file
 %<eventB>
-%<eventB>%%%%% BEGIN Commands for Pretty-Print Event-B Models %%%%%
-%<eventB>% ========================
-% \fi^^A END Produce comments only in the resulting class file
-
-% We start with the definition of the |\eventB| macro.
-%    \begin{macrocode}
-\newcommand{\eventB}{Event-B\xspace}
-%    \end{macrocode}
-%
-% The |Bcode| environment for displaying \eventB models.  The
-% environment has an optional argument for specifying the font size.
-% By default, it is the same as the |\B@fontsize| controlled by the
-% package option.   
-% 
-% \iffalse ^^A BEGIN Produce comments only in the resulting class file
-%<eventB>
-%<eventB>% Bcode environment %
-% \fi^^A END Produce comments only in the resulting class file
-%    \begin{macrocode}
-\newenvironment{Bcode}[1][\B@fontsize]{\begin{center}#1}{\end{center}}
-%    \end{macrocode}
-
-% \paragraph{Declarations and Collections}
-% \eventB modelling elements are organised into declarations (e.g.,
-% variables, constants, etc.) or collections (e.g., invariants,
-% axioms).  For each declaration, the input is a comma-separated list
-% of elements.  For each collection, the input is a
-% newly(|\\|)-separated list of elements.
-%
-% \iffalse ^^A BEGIN Produce comments only in the resulting class file
-%<eventB>
-%<eventB>% Pretty print carrier sets
-%<eventB>% Arguments:
-%<eventB>% 1. (Comma-separated) list of carrier sets.
-%<eventB>%
-%<eventB>% Usage: \carriersets{S, T}
-% \fi^^A END Produce comments only in the resulting class file
-%    \begin{macrocode}
-\newcommand{\carriersets}[1]{
-  \B@declaration{sets}{#1}
-}
-%    \end{macrocode}
-
-% \iffalse ^^A BEGIN Produce comments only in the resulting class file
-%<eventB>
-%<eventB>% Pretty print constants
-%<eventB>% Arguments:
-%<eventB>% 1. (Comma-separated) list of constants.
-%<eventB>%
-%<eventB>% Usage: \constants{m, n}
-% \fi^^A END Produce comments only in the resulting class file
-%    \begin{macrocode}
-\newcommand{\constants}[1]{
-  \B@declaration{constants}{#1}
-}
-%    \end{macrocode}
-% \iffalse ^^A BEGIN Produce comments only in the resulting class file
-%<eventB>
-%<eventB>% Pretty print axioms
-%<eventB>% Arguments:
-%<eventB>% 1. (Newline(\\)-separated) list of axioms.
-%<eventB>%
-%<eventB>% Usage: \axioms{\Baxm{axm0\_1}: & x \in \nat \\
-%<eventB>%                \Baxm{axm0\_2}: & y \in \nat \\[2ex]}
-% \fi^^A END Produce comments only in the resulting class file
-%    \begin{macrocode}
-\newcommand{\axioms}[2][]{
-  \B@section[#1]{axioms}{#2}
-}
-%    \end{macrocode}
-%
-% \iffalse ^^A BEGIN Produce comments only in the resulting class file
-%<eventB>
-%<eventB>% Pretty print variables
-%<eventB>% Arguments:
-%<eventB>% 1. (Comma-separated) list of variables.
-%<eventB>%
-%<eventB>% Usage: \variables{x, y}
-% \fi^^A END Produce comments only in the resulting class file
-%    \begin{macrocode}
-\newcommand{\variables}[1]{
-  \B@declaration{variables}{#1}
-}
-%    \end{macrocode}
-%
-% \iffalse ^^A BEGIN Produce comments only in the resulting class file
-%<eventB>
-%<eventB>% Pretty print invariants
-%<eventB>% Arguments:
-%<eventB>% 1. (Newline(\\)-separated) list of invariants.
-%<eventB>%
-%<eventB>% Usage: \invariants{\Binv{inv0\_1:} & x \in \nat \\
-%<eventB>%                    \Binv{inv0\_2:} & y \in \nat \\[2ex]}
-% \fi^^A END Produce comments only in the resulting class file
-%    \begin{macrocode}
-\newcommand{\invariants}[2][]{
-  \B@section[#1]{invariants}{#2}
-}
-%    \end{macrocode}
-% \iffalse ^^A BEGIN Produce comments only in the resulting class file
-%<eventB>
-%<eventB>% Pretty print variant
-%<eventB>% Arguments:
-%<eventB>% 1. The variant
-%<eventB>%
-%<eventB>% Usage: \variant{V}
-% \fi^^A END Produce comments only in the resulting class file
-%    \begin{macrocode}
-\newcommand{\variant}[1]{
-  \B@declaration{variant}{#1}
-}
-%    \end{macrocode}
-%
-% \paragraph{Event-B keywords}
-% We define the keywords for pretty-print \eventB models.
-% \iffalse ^^A BEGIN Produce comments only in the resulting class file
-%<eventB>
-%<eventB>% Event-B keywords for pretty-printing events %
-% \fi^^A END Produce comments only in the resulting class file
-%    \begin{macrocode}
-\newcommand{\Bany}{\B@keyword{any}}
-\newcommand{\Bbegin}{\B@keyword{begin}}
-\newcommand{\Bend}{\B@keyword{end}}
-\newcommand{\Brefines}{\B@keyword{refines}}
-\newcommand{\Bstatus}{\B@keyword{status}}
-\newcommand{\Bthen}{\B@keyword{then}}
-\newcommand{\Bwhen}{\B@keyword{when}}
-\newcommand{\Bwhere}{\B@keyword{where}}
-\newcommand{\Bwith}{\B@keyword{with}}
-%    \end{macrocode}
-%
-% \paragraph{Event-B modelling elements}
-% We define several macros for pretty-print \eventB modelling elements.
-% \iffalse ^^A BEGIN Produce comments only in the resulting class file
-%<eventB>
-%<eventB>% Pretty-print Event-B modelling elements %
-% \fi^^A END Produce comments only in the resulting class file
-%    \begin{macrocode}
-\newcommand{\Bctx}[1]{\ensuremath{\mathbf{#1}}\xspace}
-\newcommand{\Bset}[1]{\B@identifier{#1}}
-\newcommand{\Bcst}[1]{\B@identifier{#1}}
-\newcommand{\Baxm}[1]{\B@label{#1}}
-\newcommand{\Bthm}[1]{\B@label[thm]{#1}}
-
-\newcommand{\Bmch}[1]{\ensuremath{\mathbf{#1}}\xspace}
-\newcommand{\Bvrb}[1]{\B@identifier{#1}}
-\newcommand{\Binv}[1]{\B@label{#1}}
-\newcommand{\Bevt}[1]{\B@label{#1}}
-\newcommand{\Bpar}[1]{\B@identifier{#1}}
-\newcommand{\Bact}[1]{\B@label{#1}}
-\newcommand{\Bgrd}[1]{\B@label{#1}}
-\newcommand{\Bbap}[1]{\hbox{\sl\bfseries #1}}
-%    \end{macrocode}
-%
-%
-% \paragraph{Meta-macros for creating macros for modelling elements}
-% \iffalse ^^A BEGIN Produce comments only in the resulting class file
-%<eventB>
-%<eventB>%%%%% BEGIN Creating Event-B modelling elements macros %%%%%
+%<eventB>%%%%% BEGIN Meta-macros for creating Event-B modelling elements macros %%%%%
 %<eventB>% ========================
 % \fi^^A END Produce comments only in the resulting class file
 % We define meta-marcos to create macros for different modelling
@@ -1426,6 +1322,190 @@
 %    \begin{macrocode}
 \newcommand{\newBact}[2][]{\B@newmacro[#1]{#2}{\Bact}}
 %    \end{macrocode}
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>% Create a new keyword macro
+%<eventB>% Arguments:
+%<eventB>% 1. The macro string (OPTIONAL)
+%<eventB>% 2. The expanded string
+%<eventB>% Usage:
+%<eventB>% - \newBkeyword[aaa]{a\_a\_a} will create a new macro \aaa
+%<eventB>% which will be expanded to be \B@keyword{a\_a\_a}.
+%<eventB>% - \newBkeyword{aaa} will create a new macro \aaa which will be
+%<eventB>% expanded to be \B@keyword{aaa}.
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\newBkeyword}[2][]{\B@newmacro[#1]{#2}{\B@keyword}}
+%    \end{macrocode}
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>%%%%% END Meta-macros for creating Event-B modelling elements macros %%%%%
+% \fi^^A END Produce comments only in the resulting class file
+%
+% \subsection{Commands for Pretty-Print Event-B Models}
+% \label{sec:comm-pretty-print}
+
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>%%%%% BEGIN Commands for Pretty-Print Event-B Models %%%%%
+%<eventB>% ========================
+% \fi^^A END Produce comments only in the resulting class file
+%
+% We start with the definition of the |\eventB| macro.
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>% The \eventB macro.
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\eventB}{Event-B\xspace}
+%    \end{macrocode}
+%
+% The |Bcode| environment for displaying \eventB models.  The
+% environment has an optional argument for specifying the font size.
+% By default, it is the same as the |\B@fontsize| controlled by the
+% package option.   
+% 
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB> 
+%<eventB>% Bcode environment the same as the standrad center environment.
+%<eventB>% Arguments:
+%<eventB>% 1. (Optional) The font size (default to be the font size controlled by the environment).
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newenvironment{Bcode}[1][\B@fontsize]{\begin{center}#1}{\end{center}}
+%    \end{macrocode}
+
+% \paragraph{Declarations and Collections}
+% \eventB modelling elements are organised into declarations (e.g.,
+% variables, constants, etc.) or collections (e.g., invariants,
+% axioms).  For each declaration, the input is a comma-separated list
+% of elements.  For each collection, the input is a
+% newly(|\\|)-separated list of elements.
+%
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>% Pretty print carrier sets
+%<eventB>% Arguments:
+%<eventB>% 1. (Comma-separated) list of carrier sets.
+%<eventB>%
+%<eventB>% Usage: \carriersets{S, T}
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\carriersets}[1]{%
+  \B@declaration{sets}{#1}
+}
+%    \end{macrocode}
+
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>% Pretty print constants
+%<eventB>% Arguments:
+%<eventB>% 1. (Comma-separated) list of constants.
+%<eventB>%
+%<eventB>% Usage: \constants{m, n}
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\constants}[1]{%
+  \B@declaration{constants}{#1}
+}
+%    \end{macrocode}
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>% Pretty print axioms
+%<eventB>% Arguments:
+%<eventB>% 1. (Newline(\\)-separated) list of axioms.
+%<eventB>%
+%<eventB>% Usage: \axioms{\Baxm{axm0\_1}: & x \in \nat \\
+%<eventB>%                \Baxm{axm0\_2}: & y \in \nat \\[2ex]}
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\axioms}[2][]{%
+  \B@section[#1]{axioms}{#2}
+}
+%    \end{macrocode}
+%
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>% Pretty print variables
+%<eventB>% Arguments:
+%<eventB>% 1. (Comma-separated) list of variables.
+%<eventB>%
+%<eventB>% Usage: \variables{x, y}
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\variables}[1]{
+  \B@declaration{variables}{#1}
+}
+%    \end{macrocode}
+%
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>% Pretty print invariants
+%<eventB>% Arguments:
+%<eventB>% 1. (Newline(\\)-separated) list of invariants.
+%<eventB>%
+%<eventB>% Usage: \invariants{\Binv{inv0\_1:} & x \in \nat \\
+%<eventB>%                    \Binv{inv0\_2:} & y \in \nat \\[2ex]}
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\invariants}[2][]{
+  \B@section[#1]{invariants}{#2}
+}
+%    \end{macrocode}
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>% Pretty print variant
+%<eventB>% Arguments:
+%<eventB>% 1. The variant
+%<eventB>%
+%<eventB>% Usage: \variant{V}
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\variant}[1]{
+  \B@declaration{variant}{#1}
+}
+%    \end{macrocode}
+%
+% \paragraph{Event-B keywords}
+% We define the keywords for pretty-print \eventB models.
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>% Event-B keywords for pretty-printing events %
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newBkeyword[Bany]{any}
+\newBkeyword[Bbegin]{begin}
+\newBkeyword[Brefines]{refines}
+\newBkeyword[Bstatus]{status}
+\newBkeyword[Bthen]{then}
+\newBkeyword[Bwhen]{when}
+\newBkeyword[Bwhere]{where}
+\newBkeyword[Bwith]{with}
+\newBkeyword[Bend]{end}
+%    \end{macrocode}
+%
+% \paragraph{Event-B modelling elements}
+% We define several macros for pretty-print \eventB modelling elements.
+% \iffalse ^^A BEGIN Produce comments only in the resulting class file
+%<eventB>
+%<eventB>% Pretty-print Event-B modelling elements %
+% \fi^^A END Produce comments only in the resulting class file
+%    \begin{macrocode}
+\newcommand{\Bctx}[1]{\B@construct{#1}}
+\newcommand{\Bset}[1]{\B@identifier{#1}}
+\newcommand{\Bcst}[1]{\B@identifier{#1}}
+\newcommand{\Baxm}[1]{\B@label{#1}}
+\newcommand{\Bthm}[1]{\B@label[thm]{#1}}
+
+\newcommand{\Bmch}[1]{\B@construct{#1}}
+\newcommand{\Bvrb}[1]{\B@identifier{#1}}
+\newcommand{\Binv}[1]{\B@label{#1}}
+\newcommand{\Bevt}[1]{\B@label{#1}}
+\newcommand{\Bpar}[1]{\B@identifier{#1}}
+\newcommand{\Bact}[1]{\B@label{#1}}
+\newcommand{\Bgrd}[1]{\B@label{#1}}
+\newcommand{\Bbap}[1]{\hbox{\sl\bfseries #1}}
+%    \end{macrocode}
+%
 %
 %
 %

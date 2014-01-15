@@ -24,7 +24,7 @@
 % ========================
 \NeedsTeXFormat{LaTeX2e}\relax
 \ProvidesPackage{eventB}
-    [2012/02/21 v1.1.1 Package for typesetting Event-B models]
+    [2014/01/14 v2.0 Package for typesetting Event-B models]
 %%%%% END Identification part %%%%%
 
 %%%%% BEGIN Package loading %%%%%
@@ -34,52 +34,73 @@
 \RequirePackage{etoolbox}
 %%%%% END Package loading %%%%%
 
-%%%%% BEGIN Helper Macros %%%%%
+%%%%% BEGIN Internal Helper Macros %%%%%
 % ========================
 
-%   Event-B keywords base
+%   A wrapper for \ifstrequal to make sure that the first argument is properly expanded
+\newcommand{\B@ifstrequal}{\expandafter\ifstrequal\expandafter}
+
+%   Event-B keywords base.
+%   Arguments:
+%   1. The keyword.
 \newcommand{\B@keywordbase}[1]{\mathbf{#1}}
 
-%   Event-B identifiers base
+%   Event-B identifiers base.
+%   Arguments:
+%   1. The identifier.
 \newcommand{\B@identifierbase}[1]{\mathit{#1}}
 
-%   Event-B labels base
-\newcommand{\B@labelbase}[2][]{
-  \ifstrequal{#1}{}{
+%   Event-B labels base.
+%   Arguments:
+%   1. (Optional) Non-empty value indicating the label is a theorem label.
+%   2. The label.
+\newcommand{\B@labelbase}[2][]{%
+  \ifstrequal{#1}{}{%
     \mathsf{#2}
-  }{
+  }{%
     \mathit{#2}
   }
 }
 
-%   Event-B proof obligations base
-\newcommand{\B@pobase}[1]{\ensuremath{\mathsf{#1}}\xspace}
+%   Event-B constructs base.
+%   Arguments:
+%   1. The construct name.
+\newcommand{\B@constructbase}[1]{\mathsf{#1}}
 
-%   Event-B declaration (e.g., variables, constants, etc.) base
-\newcommand{\B@declarationbase}[2]{
-  \begin{array}{l@{\B@tab}l}
-    \B@keyword{#1:} &  #2
+%   Event-B proof obligations base.
+%   Arguments:
+%   1. The proof obligation name.
+\newcommand{\B@pobase}[1]{\mathsf{#1}}
+
+%   Event-B declaration (e.g., constants, variables, etc.) base
+%   Arguments:
+%   1. The keyword of the declaration.
+%   2. The declaration.
+\newcommand{\B@declarationbase}[2]{%
+  \begin{array}{@{}l@{\B@tab}l@{}}
+    \B@keyword{#1:} & #2
   \end{array}
 }
 
-%   Event-B sections (e.g., variables, constants, etc.) base
-\newcommand{\B@sectionbase}[3][]{
+%   Event-B sections (e.g., axioms, invariants, etc.) base
+%   Arguments:
+%   1. (Optional) Non-empty indicating the keyword is omitted.
+%   2. The keyword of the section.
+%   3. The section content.
+\newcommand{\B@sectionbase}[3][]{%
   \ifstrequal{#1}{}{
-    \begin{array}{l}
+    \begin{array}{@{}l@{}}
       \B@keyword{#2:} \\
-      \begin{array}{l@{\B@tab}l}
+      \begin{array}{@{\B@tab}l@{\B@tab}l@{}}
         #3
       \end{array}
     \end{array}
   }{
-    \begin{array}{l@{\B@tab}l}
+    \begin{array}{@{\B@tab}l@{\B@tab}l@{\B@tab}}
       #3
     \end{array}
   }
 }
-
-%   A wrapper for \ifstrequal to make sure that the first argument is properly expanded
-\newcommand{\B@ifstrequal}{\expandafter\ifstrequal\expandafter}
 
 %   Basic macro for pretty-print an Event-B event.
 %   Arguments:
@@ -134,13 +155,13 @@
     \B@ifstrequal{\evt@absevts}{}{
       \newcommand\pretty@absevts{}
     }{
-      \newcommand\pretty@absevts{\B@tab\Brefines \B@tab \evt@absevts{} \\}
+      \newcommand\pretty@absevts{\B@tab \Brefines \B@tab \evt@absevts{} \\}
     }
     % Pretty-print parameters
     \B@ifstrequal{\evt@pars}{}{
       \newcommand\pretty@pars{}
     }{
-      \newcommand\pretty@pars{\B@tab\Bany \B@tab \evt@pars \B@tab \Bwhere \\}
+      \newcommand\pretty@pars{\B@tab \Bany \B@tab \evt@pars \B@tab \Bwhere \\}
     }
     % Pretty-print guards
     \B@ifstrequal{\evt@grds}{}{
@@ -191,7 +212,7 @@
       \pretty@acts@tmp
     }
     % Putting the pieces together
-    \begin{array}{l}
+    \begin{array}{@{}l@{}}
       \Bevt{\evt@label} \\
       \pretty@sts
       \pretty@absevts
@@ -293,14 +314,12 @@
       \pretty@acts@tmp~
     }
     % Putting the pieces together
-    \begin{array}{l}
       \Bevt{\evt@label}\pretty@sts\pretty@absevts~\widehat{=}~
       \pretty@pars
       \pretty@grds
       \pretty@wits
       \pretty@acts
       \Bend
-    \end{array}
   } % END group
 }
 
@@ -317,7 +336,7 @@
   }
 }
 
-%%%%% END Helper Macros %%%%%
+%%%%% END Internal Helper Macros %%%%%
 
 %%%%% BEGIN Declaration of options %%%%%
 % ========================
@@ -336,8 +355,8 @@
 
 % Event-B declarations (e.g. variables, constants)
 \newcommand{\B@declaration}[2]{
-  \B@makebox{
-    \ensuremath{
+  \B@makebox{%
+    \ensuremath{%
       \B@declarationbase{#1}{#2}
     }
   }
@@ -345,8 +364,8 @@
 
 % Event-B sections (e.g. invariants, axioms)
 \newcommand{\B@section}[3][]{
-  \B@makebox{
-    \ensuremath{
+  \B@makebox{%
+    \ensuremath{%
       \B@sectionbase[#1]{#2}{#3}
     }
   }
@@ -354,7 +373,7 @@
 
 % Option 'nobox': Redefine above commands
 \DeclareOption{nobox}{
-  \renewcommand{\B@event}[7][]{
+  \renewcommand{\B@event}[7][]{%
     \B@eventbase[#1]{#2}{#3}{#4}{#5}{#6}{#7}
   }
   \renewcommand{\B@declaration}[2]{
@@ -418,6 +437,9 @@
 % Event-B labels
 \newcommand{\B@label}[2][]{\ensuremath{\B@labelbase[#1]{#2}}\xspace}
 
+% Event-B constructs
+\newcommand{\B@construct}[1]{\ensuremath{\B@constructbase{#1}}\xspace}
+
 % Event-B proof obligations
 \newcommand{\B@po}[1]{\ensuremath{\B@pobase{#1}}\xspace}
 
@@ -436,6 +458,10 @@
   \newcommand{\setBLabelColour}[1]{\colorlet{B@labelcolor}{#1}}
   \setBLabelColour{green!50!black}
 
+  %   Macro for defining Event-B constructs colour
+  \newcommand{\setBConstructColour}[1]{\colorlet{B@constructcolor}{#1}}
+  \setBConstructColour{orange!75!black}
+
   %   Macro for defining Event-B proof obligations colour
   \newcommand{\setBPOColour}[1]{\colorlet{B@pocolor}{#1}}
   \setBPOColour{red}
@@ -449,6 +475,9 @@
   }
   \renewcommand{\B@label}[2][]{
     \ensuremath{\textcolor{B@labelcolor}{\B@labelbase[#1]{#2}}}\xspace
+  }
+  \renewcommand{\B@construct}[1]{
+    \ensuremath{\textcolor{B@constructcolor}{\B@constructbase{#1}}}\xspace
   }
   \renewcommand{\B@po}[1]{
     \ensuremath{\textcolor{B@pocolor}{\B@pobase{#1}}}\xspace
@@ -465,101 +494,7 @@
 %%%%% END Execution of options %%%%%
 
 
-
-%%%%% BEGIN Commands for Pretty-Print Event-B Models %%%%%
-% ========================
-
-\newcommand{\eventB}{Event-B\xspace}
-
-% Bcode environment %
-\newenvironment{Bcode}[1][\B@fontsize]{\begin{center}#1}{\end{center}}
-
-
-% Pretty print carrier sets
-% Arguments:
-% 1. (Comma-separated) list of carrier sets.
-%
-% Usage: \carriersets{S, T}
-\newcommand{\carriersets}[1]{
-  \B@declaration{sets}{#1}
-}
-
-
-% Pretty print constants
-% Arguments:
-% 1. (Comma-separated) list of constants.
-%
-% Usage: \constants{m, n}
-\newcommand{\constants}[1]{
-  \B@declaration{constants}{#1}
-}
-
-% Pretty print axioms
-% Arguments:
-% 1. (Newline(\\)-separated) list of axioms.
-%
-% Usage: \axioms{\Baxm{axm0\_1}: & x \in \nat \\
-%                \Baxm{axm0\_2}: & y \in \nat \\[2ex]}
-\newcommand{\axioms}[2][]{
-  \B@section[#1]{axioms}{#2}
-}
-
-% Pretty print variables
-% Arguments:
-% 1. (Comma-separated) list of variables.
-%
-% Usage: \variables{x, y}
-\newcommand{\variables}[1]{
-  \B@declaration{variables}{#1}
-}
-
-% Pretty print invariants
-% Arguments:
-% 1. (Newline(\\)-separated) list of invariants.
-%
-% Usage: \invariants{\Binv{inv0\_1:} & x \in \nat \\
-%                    \Binv{inv0\_2:} & y \in \nat \\[2ex]}
-\newcommand{\invariants}[2][]{
-  \B@section[#1]{invariants}{#2}
-}
-
-% Pretty print variant
-% Arguments:
-% 1. The variant
-%
-% Usage: \variant{V}
-\newcommand{\variant}[1]{
-  \B@declaration{variant}{#1}
-}
-
-% Event-B keywords for pretty-printing events %
-\newcommand{\Bany}{\B@keyword{any}}
-\newcommand{\Bbegin}{\B@keyword{begin}}
-\newcommand{\Bend}{\B@keyword{end}}
-\newcommand{\Brefines}{\B@keyword{refines}}
-\newcommand{\Bstatus}{\B@keyword{status}}
-\newcommand{\Bthen}{\B@keyword{then}}
-\newcommand{\Bwhen}{\B@keyword{when}}
-\newcommand{\Bwhere}{\B@keyword{where}}
-\newcommand{\Bwith}{\B@keyword{with}}
-
-% Pretty-print Event-B modelling elements %
-\newcommand{\Bctx}[1]{\ensuremath{\mathbf{#1}}\xspace}
-\newcommand{\Bset}[1]{\B@identifier{#1}}
-\newcommand{\Bcst}[1]{\B@identifier{#1}}
-\newcommand{\Baxm}[1]{\B@label{#1}}
-\newcommand{\Bthm}[1]{\B@label[thm]{#1}}
-
-\newcommand{\Bmch}[1]{\ensuremath{\mathbf{#1}}\xspace}
-\newcommand{\Bvrb}[1]{\B@identifier{#1}}
-\newcommand{\Binv}[1]{\B@label{#1}}
-\newcommand{\Bevt}[1]{\B@label{#1}}
-\newcommand{\Bpar}[1]{\B@identifier{#1}}
-\newcommand{\Bact}[1]{\B@label{#1}}
-\newcommand{\Bgrd}[1]{\B@label{#1}}
-\newcommand{\Bbap}[1]{\hbox{\sl\bfseries #1}}
-
-%%%%% BEGIN Creating Event-B modelling elements macros %%%%%
+%%%%% BEGIN Meta-macros for creating Event-B modelling elements macros %%%%%
 % ========================
 
 % Create a new B macro
@@ -711,6 +646,115 @@
 % - \newBact{aaa} will create a new macro \aaa which will be
 % expanded to be \Bact{aaa}.
 \newcommand{\newBact}[2][]{\B@newmacro[#1]{#2}{\Bact}}
+
+% Create a new keyword macro
+% Arguments:
+% 1. The macro string (OPTIONAL)
+% 2. The expanded string
+% Usage:
+% - \newBkeyword[aaa]{a\_a\_a} will create a new macro \aaa
+% which will be expanded to be \B@keyword{a\_a\_a}.
+% - \newBkeyword{aaa} will create a new macro \aaa which will be
+% expanded to be \B@keyword{aaa}.
+\newcommand{\newBkeyword}[2][]{\B@newmacro[#1]{#2}{\B@keyword}}
+
+%%%%% END Meta-macros for creating Event-B modelling elements macros %%%%%
+
+
+%%%%% BEGIN Commands for Pretty-Print Event-B Models %%%%%
+% ========================
+% The \eventB macro.
+\newcommand{\eventB}{Event-B\xspace}
+
+% Bcode environment the same as the standrad center environment.
+% Arguments:
+% 1. (Optional) The font size (default to be the font size controlled by the environment).
+\newenvironment{Bcode}[1][\B@fontsize]{\begin{center}#1}{\end{center}}
+
+
+% Pretty print carrier sets
+% Arguments:
+% 1. (Comma-separated) list of carrier sets.
+%
+% Usage: \carriersets{S, T}
+\newcommand{\carriersets}[1]{%
+  \B@declaration{sets}{#1}
+}
+
+
+% Pretty print constants
+% Arguments:
+% 1. (Comma-separated) list of constants.
+%
+% Usage: \constants{m, n}
+\newcommand{\constants}[1]{%
+  \B@declaration{constants}{#1}
+}
+
+% Pretty print axioms
+% Arguments:
+% 1. (Newline(\\)-separated) list of axioms.
+%
+% Usage: \axioms{\Baxm{axm0\_1}: & x \in \nat \\
+%                \Baxm{axm0\_2}: & y \in \nat \\[2ex]}
+\newcommand{\axioms}[2][]{%
+  \B@section[#1]{axioms}{#2}
+}
+
+% Pretty print variables
+% Arguments:
+% 1. (Comma-separated) list of variables.
+%
+% Usage: \variables{x, y}
+\newcommand{\variables}[1]{
+  \B@declaration{variables}{#1}
+}
+
+% Pretty print invariants
+% Arguments:
+% 1. (Newline(\\)-separated) list of invariants.
+%
+% Usage: \invariants{\Binv{inv0\_1:} & x \in \nat \\
+%                    \Binv{inv0\_2:} & y \in \nat \\[2ex]}
+\newcommand{\invariants}[2][]{
+  \B@section[#1]{invariants}{#2}
+}
+
+% Pretty print variant
+% Arguments:
+% 1. The variant
+%
+% Usage: \variant{V}
+\newcommand{\variant}[1]{
+  \B@declaration{variant}{#1}
+}
+
+% Event-B keywords for pretty-printing events %
+\newBkeyword[Bany]{any}
+\newBkeyword[Bbegin]{begin}
+\newBkeyword[Brefines]{refines}
+\newBkeyword[Bstatus]{status}
+\newBkeyword[Bthen]{then}
+\newBkeyword[Bwhen]{when}
+\newBkeyword[Bwhere]{where}
+\newBkeyword[Bwith]{with}
+\newBkeyword[Bend]{end}
+
+% Pretty-print Event-B modelling elements %
+\newcommand{\Bctx}[1]{\B@construct{#1}}
+\newcommand{\Bset}[1]{\B@identifier{#1}}
+\newcommand{\Bcst}[1]{\B@identifier{#1}}
+\newcommand{\Baxm}[1]{\B@label{#1}}
+\newcommand{\Bthm}[1]{\B@label[thm]{#1}}
+
+\newcommand{\Bmch}[1]{\B@construct{#1}}
+\newcommand{\Bvrb}[1]{\B@identifier{#1}}
+\newcommand{\Binv}[1]{\B@label{#1}}
+\newcommand{\Bevt}[1]{\B@label{#1}}
+\newcommand{\Bpar}[1]{\B@identifier{#1}}
+\newcommand{\Bact}[1]{\B@label{#1}}
+\newcommand{\Bgrd}[1]{\B@label{#1}}
+\newcommand{\Bbap}[1]{\hbox{\sl\bfseries #1}}
 
 %%%%% Theorem Proof Obligation
 %%%%% Print the theorem proof obligation, given the theorem label.
