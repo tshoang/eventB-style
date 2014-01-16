@@ -182,7 +182,7 @@
 %<eventB>%   1. The keyword.
 %   \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
-\newcommand{\B@keywordbase}[1]{\mathbf{#1}}
+\newcommand{\B@keywordbase}[1]{\mathsf{#1}}
 %    \end{macrocode}
 % \end{macro}
 % 
@@ -1071,19 +1071,19 @@
 %<eventB>  %   Redefine commands
 %   \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
-  \renewcommand{\B@keyword}[1]{
+  \renewcommand{\B@keyword}[1]{% Remove the leading space
     \ensuremath{\textcolor{B@keywordcolor}{\B@keywordbase{#1}}}\xspace
   }
-  \renewcommand{\B@identifier}[1]{
+  \renewcommand{\B@identifier}[1]{% Remove the leading space
     \ensuremath{\textcolor{B@identifiercolor}{\B@identifierbase{#1}}}\xspace
   }
-  \renewcommand{\B@label}[2][]{
+  \renewcommand{\B@label}[2][]{% Remove the leading space
     \ensuremath{\textcolor{B@labelcolor}{\B@labelbase[#1]{#2}}}\xspace
   }
-  \renewcommand{\B@construct}[1]{
+  \renewcommand{\B@construct}[1]{% Remove the leading space
     \ensuremath{\textcolor{B@constructcolor}{\B@constructbase{#1}}}\xspace
   }
-  \renewcommand{\B@po}[1]{
+  \renewcommand{\B@po}[1]{% Remove the leading space
     \ensuremath{\textcolor{B@pocolor}{\B@pobase{#1}}}\xspace
   }
 }
@@ -1472,9 +1472,22 @@
 %<eventB>% Event-B keywords for pretty-printing events %
 % \fi^^A END Produce comments only in the resulting class file
 %    \begin{macrocode}
+\newBkeyword[Bcontext]{context}
+\newBkeyword[Bsets]{sets}
+\newBkeyword[Bconstants]{constants}
+\newBkeyword[Baxioms]{axioms}
+
+\newBkeyword[Bmachine]{machine}
+\newBkeyword[Brefines]{refines}
+\newBkeyword[Bsees]{sees}
+\newBkeyword[Bvariables]{variables}
+\newBkeyword[Binvariants]{invariants}
+\newBkeyword[Bevents]{events}
+
+\newBkeyword[Bevent]{event}
+\newBkeyword[Bextends]{extends}
 \newBkeyword[Bany]{any}
 \newBkeyword[Bbegin]{begin}
-\newBkeyword[Brefines]{refines}
 \newBkeyword[Bstatus]{status}
 \newBkeyword[Bthen]{then}
 \newBkeyword[Bwhen]{when}
